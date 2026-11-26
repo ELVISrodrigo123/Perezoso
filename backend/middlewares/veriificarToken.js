@@ -1,16 +1,20 @@
 import jwt from 'jsonwebtoken'
 
-export const verificarToken = (req, res, next) => {
-  const header = req.headers.authorization
+export const TIPO_ACCESS_TOKEN = 'access'
+export const TIPO_REFRESH_TOKEN = 'refresh'
 
-  if (!header) {
+export const verificarToken = (req, res, next) => {
+  const [esquema, token] = (req.headers.authorization ?? '').split(' ')
+
+  if (esquema !== 'Bearer' || !token) {
     return res.status(401).json({ message: 'token no autorizado ' })
   }
 
-  const token = header.split(' ')[1]
-
   try {
     const usuario = jwt.verify(token, process.env.JWT_SECRET)
+    if (usuario.type !== TIPO_ACCESS_TOKEN) {
+      return res.status(401).json({ message: 'token no  valido o expirado ' })
+    }
     req.user = usuario
     next()
   } catch (err) {

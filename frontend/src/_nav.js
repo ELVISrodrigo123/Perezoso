@@ -2,6 +2,7 @@ import CIcon from '@coreui/icons-react'
 import {
   cilShieldAlt,
   cilBook,
+  cilSettings,
   cilCash,
   cilEducation,
   cilPeople,
@@ -93,6 +94,14 @@ const _nav = [
     to: '/admin/control-pagos',
     icon: <CIcon icon={cilCash} customClassName="nav-icon" />,
     roles: ['administrador'],
+  },
+  {
+    component: CNavItem,
+    name: 'Configuración',
+    to: '/admin/configuracion',
+    icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
+    roles: ['administrador'],
+    permiso: 'settings.enrollment_deadline.read',
   },
   {
     component: CNavTitle,

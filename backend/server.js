@@ -25,6 +25,7 @@ import { verificarToken } from './middlewares/veriificarToken.js'
 import { requireRole } from './middlewares/requireRole.js'
 
 import superAdministradorRoutes from './routes/gestionAdministrador/superAdministrador.js'
+import plazoInscripcionRoutes from './routes/gestionAdministrador/plazoInscripcionRoutes.js'
 
 dotenv.config({ path: './.env' })
 const app = express()
@@ -52,10 +53,10 @@ app.use('/admin', verificarToken, requireRole('administrador'), profesorRoutes)
 app.use('/admin', verificarToken, requireRole('administrador'), inscripcionRoutes)
 app.use('/admin', verificarToken, requireRole('administrador'), padresTutorRoutes)
 app.use('/admin', verificarToken, requireRole('administrador'), habilitacionEstados)
+app.use('/admin', verificarToken, requireRole('administrador'), plazoInscripcionRoutes)
 
 app.use('/docente', verificarToken, requireRole('profesor'), gestionProfesorRoutes)
 app.use('/estudiante', verificarToken, requireRole('estudiante'), gestionEstudianteRoutes)
-app.use('/estudiante', verificarToken, requireRole('estudiante'), inscripcionRoutes)
 
 app.use('/api/chatbot', verificarApiKey, chatbotRoutes)
 

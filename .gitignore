@@ -51,3 +51,7 @@ Thumbs.db
 # ================================
 chatbot/.n8n-data/
 chatbot/.env
+# ================================
+# Local: bitácoras, grafos y métricas
+# ================================
+

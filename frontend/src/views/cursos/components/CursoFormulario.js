@@ -142,7 +142,7 @@ const CursoFormulario = ({
             {errores.precio && <CFormFeedback invalid>{errores.precio}</CFormFeedback>}
           </CCol>
           <CCol md={6} className="curso-form__field">
-            <CFormLabel htmlFor="curso-fecha-creacion">Fecha de creación</CFormLabel>
+            <CFormLabel htmlFor="curso-fecha-creacion">Fecha de inicio</CFormLabel>
             <CFormInput
               id="curso-fecha-creacion"
               type="date"

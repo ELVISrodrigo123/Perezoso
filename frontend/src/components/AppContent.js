@@ -48,7 +48,7 @@ const AppContent = () => {
           {routes.map((route) => {
             const Element = route.element
             const contenido = route.roles ? (
-              <ProteccionRol rolesPermitidos={route.roles}>
+              <ProteccionRol rolesPermitidos={route.roles} permiso={route.permiso}>
                 <Element />
               </ProteccionRol>
             ) : (

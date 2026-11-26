@@ -7,6 +7,7 @@ import { eliminarInscripcionPorId, eliminarTodasInscripcionesDelCurso } from '..
 import { eliminarInscripcionPorEstudiante } from '../models/modelsInscripcion/eliminarInscripcionPorEstudiante.js'
 import { obtenerPaginacion, armarRespuestaPaginada } from '../utils/paginacion.js'
 import dataBase from '../db/dataBase.js'
+import { ErrorInscripcion, responderErrorInscripcion, validarInscripcionACurso } from '../services/validarInscripcion.js'
 
 export const getInscripciones = async (req, res) => {
   try {
@@ -48,17 +49,23 @@ export const getInscripcionesPorProfesor = async (req, res) => {
 }
 
 export const postInscripciones = async (req, res) => {
-  const { idEstudiante, idCurso } = req.body
+  const idEstudiante = Number(req.body.idEstudiante)
+  const cursosSolicitados = [...new Set(req.body.idCurso.map(Number))]
+  const client = await dataBase.connect()
   try {
-    const actuales = await dataBase.query(
-      'SELECT id_curso FROM inscripcion WHERE id_estudiante = $1'
-      , [idEstudiante])
+    await client.query('BEGIN')
+
+    const actuales = await client.query(
+      'SELECT id_curso FROM inscripcion WHERE id_estudiante = $1',
+      [idEstudiante]
+    )
     const cursosActuales = actuales.rows.map(row => row.id_curso)
 
-    const cursosAInsertar = idCurso.filter(id => !cursosActuales.includes(id))
-    const cursosAEliminar = cursosActuales.filter(id => !idCurso.includes(id))
+    const cursosAInsertar = cursosSolicitados.filter(id => !cursosActuales.includes(id)).sort((a, b) => a - b)
+    const cursosAEliminar = cursosActuales.filter(id => !cursosSolicitados.includes(id))
+
     if (cursosAInsertar.length > 0) {
-      const conflicto = await dataBase.query(`
+      const conflicto = await client.query(`
         SELECT cu.nombre
         FROM curso cu
         JOIN profesor pro ON pro.id_profesor = cu.id_profesor
@@ -67,6 +74,7 @@ export const postInscripciones = async (req, res) => {
       `, [idEstudiante, cursosAInsertar])
 
       if (conflicto.rowCount > 0) {
+        await client.query('ROLLBACK')
         return res.status(400).json({
           error: 'profesor_del_curso',
           message: `No se puede inscribir: esta persona es el profesor del curso "${conflicto.rows[0].nombre}".`
@@ -74,30 +82,35 @@ export const postInscripciones = async (req, res) => {
       }
     }
 
-    await dataBase.query('BEGIN')
     if (cursosAEliminar.length > 0) {
-      await dataBase.query('DELETE FROM inscripcion WHERE id_estudiante = $1 AND id_curso = ANY($2::INT[])', [idEstudiante, cursosAEliminar])
+      await client.query('DELETE FROM inscripcion WHERE id_estudiante = $1 AND id_curso = ANY($2::INT[])', [idEstudiante, cursosAEliminar])
     }
 
     for (const id of cursosAInsertar) {
-      await crearInscripcion(dataBase, { idEstudiante, idCurso: id })
+      await validarInscripcionACurso(id, client)
+      await crearInscripcion(client, { idEstudiante, idCurso: id })
     }
 
-    await dataBase.query('COMMIT')
+    await client.query('COMMIT')
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Inscripciones procesadas correctamente',
       insertados: cursosAInsertar.length,
       eliminados: cursosAEliminar.length,
-      totalCursos: idCurso.length
+      totalCursos: cursosSolicitados.length
     })
   } catch (error) {
-    await dataBase.query('ROLLBACK')
+    await client.query('ROLLBACK').catch(() => {})
+    if (error instanceof ErrorInscripcion) {
+      return responderErrorInscripcion(res, error)
+    }
     console.error(error)
     return res.status(500).json({
       error: 'Error interno',
       message: ' No se pudieron actualizar las inscripicones del estudiante'
     })
+  } finally {
+    client.release()
   }
 }
 

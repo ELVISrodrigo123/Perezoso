@@ -6,7 +6,7 @@ import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
 
 import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
-import { obtenerRol } from '../views/utils/usuario'
+import { hasPermission, obtenerRol } from '../views/utils/usuario'
 
 export const AppSidebarNav = ({ items }) => {
   const rol = obtenerRol()
@@ -14,6 +14,7 @@ export const AppSidebarNav = ({ items }) => {
   const filtrarItems = (itemsToFilter) =>
     itemsToFilter
       .filter((item) => !item.roles || item.roles.includes(rol))
+      .filter((item) => !item.permiso || hasPermission(item.permiso))
       .map((item) => {
         if (!item.items) {
           return item

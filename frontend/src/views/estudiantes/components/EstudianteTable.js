@@ -464,29 +464,8 @@ const EstudianteTable = ({
     }
   }
 
-  const DIAS_PARA_INSCRIBIRSE = 10
-
-  const parsearFecha = (valor) => {
-    if (!valor) return null
-    const [anio, mes, dia] = String(valor).slice(0, 10).split('-').map(Number)
-    return new Date(anio, mes - 1, dia)
-  }
-
-  const cursoPermiteInscripcion = (curso) => {
-    const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0)
-
-    const inicio = parsearFecha(curso.fecha_creacion)
-    const fin = parsearFecha(curso.fecha_fin)
-
-    if (fin && hoy > fin) return false
-
-    if (!inicio || hoy < inicio) return true
-
-    const limite = new Date(inicio)
-    limite.setDate(limite.getDate() + DIAS_PARA_INSCRIBIRSE)
-    return hoy <= limite
-  }
+  const cursoSeleccionable = (curso) =>
+    curso.inscripcion_abierta || cursosSeleccionadosSet.has(Number(curso.id_curso))
 
   return (
     <>
@@ -718,7 +697,7 @@ const EstudianteTable = ({
             className="estudiante-form__input estudiante-form__select bm-multi-select"
             aria-describedby="estudiante-cursos-ayuda"
           >
-            {cursos.filter(cursoPermiteInscripcion).map((curs) => (
+            {cursos.filter(cursoSeleccionable).map((curs) => (
               <option key={curs.id_curso} value={curs.id_curso}>
                 {curs.nombre}
               </option>

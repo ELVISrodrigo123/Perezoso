@@ -8,6 +8,7 @@ import {
 } from '../controllers/inscripcionController.js'
 import { validarInscripcion } from '../middlewares/inscripcionValidacion/inscripcionValidator.js'
 import { validarCampos } from '../middlewares/validarCampos/validarCampos.js'
+import { requirePermission } from '../middlewares/requirePermission.js'
 import { getMostrarRecibos, postRegistrarRecibos, getControlDePagosEstudiante, putMarcarInscripcionComoPagada } from '../controllers/controlDePagosEstudiante.js'
 
 const router = Router()
@@ -15,7 +16,7 @@ const router = Router()
 router.get('/inscripciones', getInscripciones)
 router.get('/inscripciones/curso/:id', getInscripcionesPorCurso)
 router.get('/inscripciones/profesor/:id', getInscripcionesPorProfesor)
-router.post('/inscripciones', validarInscripcion, validarCampos, postInscripciones)
+router.post('/inscripciones', requirePermission('enrollments.create'), validarInscripcion, validarCampos, postInscripciones)
 router.get('/inscripciones/estudiante/:id', mostrarInscripcionPorEstudiante)
 router.delete('/inscripciones/:id', deleteInscripcionPorId)
 router.delete('/inscripciones/:id/estudiante', deleteinscripcionPorEstudiante)

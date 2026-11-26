@@ -15,8 +15,7 @@ import {
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 import respaldoCursos from '../../../../assets/images/respaldoCursosWeb.jpg'
-
-const DIAS_PARA_INSCRIBIRSE = 10
+import { estadoVisualDelCurso } from '../../../utils/plazoInscripcion'
 
 const parsearFecha = (valor) => {
   if (!valor) return null
@@ -29,54 +28,16 @@ const formatearFecha = (valor) => {
   return fecha ? fecha.toLocaleDateString('es-BO') : 'Por confirmar'
 }
 
+const TEXTO_ANTES_DEL_INICIO = 'Preinscribirse'
+
 const obtenerEstadoCurso = (curso) => {
-  const hoy = new Date()
-  hoy.setHours(0, 0, 0, 0)
-
-  const creacion = parsearFecha(curso.fecha_creacion)
-  const fin = parsearFecha(curso.fecha_fin)
-
-  if (fin && hoy > fin) {
-    return {
-      texto: 'TERMINADO',
-      color: 'danger',
-      puedeInscribirse: false,
-      ayuda: 'El curso ya terminó',
-    }
-  }
-
-  if (!creacion || hoy < creacion) {
-    return {
-      texto: 'Preinscribirse',
-      color: 'primary',
-      puedeInscribirse: true,
-      ayuda: '',
-    }
-  }
-
-  const limite = new Date(creacion)
-  limite.setDate(limite.getDate() + DIAS_PARA_INSCRIBIRSE)
-
-  if (hoy <= limite) {
-    return {
-      texto: 'EN CURSO',
-      color: 'success',
-      puedeInscribirse: true,
-      ayuda: 'Se puede inscribir',
-    }
-  }
-
-  return {
-    texto: 'EN CURSO',
-    color: 'danger',
-    puedeInscribirse: false,
-    ayuda: 'Ya no se puede inscribir',
-  }
+  const estado = estadoVisualDelCurso(curso, TEXTO_ANTES_DEL_INICIO)
+  return { ...estado, color: estado.tono ?? 'primary' }
 }
 
 const prioridadEstado = (curso) => {
   const estado = obtenerEstadoCurso(curso)
-  if (estado.texto === 'Preinscribirse') return 1
+  if (estado.texto === TEXTO_ANTES_DEL_INICIO) return 1
   if (estado.texto === 'EN CURSO' && estado.puedeInscribirse) return 2
   if (estado.texto === 'EN CURSO') return 3
   return 4

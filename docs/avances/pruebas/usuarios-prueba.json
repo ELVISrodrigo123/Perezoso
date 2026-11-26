@@ -1,0 +1,12 @@
+{
+  "super": { "email": "TEST_super@academia.test", "password": "Super123!" },
+  "admin": { "email": "TEST_admin@academia.test", "password": "Admin123!" },
+  "profe1": { "email": "TEST_profe1@academia.test", "password": "Profe123!" },
+  "profe2": { "email": "TEST_profe2@academia.test", "password": "Profe123!" },
+  "est1": { "email": "TEST_est1@academia.test", "password": "Estu123!" },
+  "est2": { "email": "TEST_est2@academia.test", "password": "Estu123!" },
+  "est3": { "email": "TEST_est3@academia.test", "password": "Estu123!" },
+  "est4": { "email": "TEST_est4@academia.test", "password": "Estu123!" },
+  "profeEst": { "email": "TEST_profe_est@academia.test", "password": "Multi123!" },
+  "adminProfe": { "email": "TEST_admin_profe@academia.test", "password": "Multi123!" }
+}

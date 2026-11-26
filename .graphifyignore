@@ -1,0 +1,9 @@
+node_modules/
+**/node_modules/
+dist/
+build/
+.VSCodeCounter/
+**/package-lock.json
+graphify-out/
+docs/avances/
+chatbot/.n8n-data/

@@ -16,6 +16,10 @@ export const obtenerUsuario = () => {
 
 export const obtenerRol = () => obtenerUsuario()?.role || null
 
+export const obtenerPermisos = () => obtenerUsuario()?.permisos || []
+
+export const hasPermission = (permiso) => obtenerPermisos().includes(permiso)
+
 export const obtenerRutaPrincipal = () => {
   const rutasPorRol = {
     administrador: '/dashboard',

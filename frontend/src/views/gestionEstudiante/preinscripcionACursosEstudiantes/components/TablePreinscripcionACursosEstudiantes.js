@@ -2,13 +2,13 @@ import { mostrarDuracion } from '../../../utils/duracion'
 import { cilClock, cilPeople, cilMoney, cilCalendar } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import respaldoCursos from '../../../../assets/images/respaldoCursosWeb.jpg'
+import { estadoVisualDelCurso } from '../../../utils/plazoInscripcion'
 
-const DIAS_PARA_INSCRIBIRSE = 10
+const COLORES_POR_TONO = {
+  success: '#198754',
+  danger: '#dc3545',
+}
 
-const COLOR_VERDE = '#198754'
-const COLOR_ROJO = '#dc3545'
-
-// Convierte "2026-04-15T11:17:15.136Z" a fecha local sin problemas de zona horaria
 const parsearFecha = (valor) => {
   if (!valor) return null
   const [anio, mes, dia] = String(valor).slice(0, 10).split('-').map(Number)
@@ -21,51 +21,8 @@ const formatearFecha = (valor) => {
 }
 
 const obtenerEstadoCurso = (curso) => {
-  const hoy = new Date()
-  hoy.setHours(0, 0, 0, 0)
-
-  const creacion = parsearFecha(curso.fecha_creacion)
-  const fin = parsearFecha(curso.fecha_fin)
-
-  // Ya terminó
-  if (fin && hoy > fin) {
-    return {
-      texto: 'TERMINADO',
-      color: COLOR_ROJO,
-      puedeInscribirse: false,
-      ayuda: 'El curso ya terminó',
-    }
-  }
-
-  // Aún no inicia: botón normal
-  if (!creacion || hoy < creacion) {
-    return {
-      texto: 'Inscribirse',
-      color: null,
-      puedeInscribirse: true,
-      ayuda: '',
-    }
-  }
-
-  // Ya inició: se cuentan los 10 días desde fecha_creacion
-  const limite = new Date(creacion)
-  limite.setDate(limite.getDate() + DIAS_PARA_INSCRIBIRSE)
-
-  if (hoy <= limite) {
-    return {
-      texto: 'EN CURSO',
-      color: COLOR_VERDE,
-      puedeInscribirse: true,
-      ayuda: 'Se puede inscribir',
-    }
-  }
-
-  return {
-    texto: 'EN CURSO',
-    color: COLOR_ROJO,
-    puedeInscribirse: false,
-    ayuda: 'Ya no se puede inscribir',
-  }
+  const estado = estadoVisualDelCurso(curso, 'Inscribirse')
+  return { ...estado, color: COLORES_POR_TONO[estado.tono] ?? null }
 }
 
 const TablePreinscripcionACursosEstudiantes = ({

@@ -4,9 +4,10 @@ import { verificarToken } from '../middlewares/veriificarToken.js'
 const route = express.Router()
 
 route.get('/perfil', verificarToken, (req, res) => {
+  const { id, email, role, roles, permisos } = req.user
   res.json({
     message: 'token autorizado',
-    usuario: req.usuario
+    usuario: { id, email, role, roles, permisos }
   })
 })
 

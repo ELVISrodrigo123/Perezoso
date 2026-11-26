@@ -1,4 +1,5 @@
 import dataBase from '../../../db/dataBase.js'
+import { COLUMNAS_ESTADO_INSCRIPCION, unirEstadoInscripcion } from '../../modelsCursos/estadoInscripcionCurso.js'
 
 export const obtenerDeudasEstudiante = async (idUsuario) => {
   const informe = await dataBase.query(`
@@ -51,8 +52,10 @@ export const obtenerCursosNoInscritosDelEstudiante = async (idUsuario, { limit, 
     )`, [idUsuario])
 
   const dataResult = await dataBase.query(`
-    SELECT cur.id_curso, cur.nombre AS materia, cur.descripcion, cur.fecha_creacion, (cur.fecha_creacion + cur.duracion) as fecha_fin, cur.duracion, cur.costo, cur.cupo_total
+    SELECT cur.id_curso, cur.nombre AS materia, cur.descripcion, cur.fecha_creacion, (cur.fecha_creacion + cur.duracion) as fecha_fin, cur.duracion, cur.costo, cur.cupo_total,
+    ${COLUMNAS_ESTADO_INSCRIPCION}
     FROM curso cur
+    ${unirEstadoInscripcion('cur')}
     WHERE cur.id_curso NOT IN (
       SELECT ins.id_curso
       FROM inscripcion ins
@@ -68,8 +71,8 @@ export const obtenerCursosNoInscritosDelEstudiante = async (idUsuario, { limit, 
   }
 }
 
-export const crearInscripcionAunCurso = async (idEstudiante, idCurso) => {
-  const inscripcion = await dataBase.query(`
+export const crearInscripcionAunCurso = async (idEstudiante, idCurso, db = dataBase) => {
+  const inscripcion = await db.query(`
         INSERT INTO inscripcion (id_estudiante, id_curso)
         VALUES ($1, $2)
         `, [idEstudiante, idCurso])
@@ -85,5 +88,5 @@ export const obtenerEstudiante = async (idUsuario) => {
     [idUsuario]
   )
 
-  return informe.rows[0].id_estudiante
+  return informe.rows[0]?.id_estudiante ?? null
 }

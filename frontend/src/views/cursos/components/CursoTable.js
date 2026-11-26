@@ -22,6 +22,9 @@ import { cilFilter, cilSearch } from '@coreui/icons'
 import { useEffect, useState } from 'react'
 import { SectionCard, StatusBadge, LoadingState } from '../../../components'
 import Paginacion from '../../../components/Paginacion'
+import PlazoInscripcionModal from './PlazoInscripcionModal'
+import { hasPermission } from '../../utils/usuario'
+import { ESTADOS_INSCRIPCION, formatearFechaIso } from '../../utils/plazoInscripcion'
 
 const CursoTable = ({
   cursos,
@@ -45,6 +48,13 @@ const CursoTable = ({
   setFiltrosColumna,
 }) => {
   const [filtroAbierto, setFiltroAbierto] = useState(null)
+  const [idCursoPlazo, setIdCursoPlazo] = useState(null)
+  const puedeEditarPlazo = hasPermission('courses.enrollment_deadline.update')
+
+  const plazoGuardado = () => {
+    setIdCursoPlazo(null)
+    cargarCursos()
+  }
 
   const profesoresDisponibles = [
     ...new Set((profesores || []).map((prof) => `${prof.nombre} ${prof.a_paterno}`)),
@@ -146,6 +156,9 @@ const CursoTable = ({
                 {renderEncabezadoFiltrable('Inicio', 'inicio', 'date')}
                 {renderEncabezadoFiltrable('Fin', 'fin', 'date')}
                 {renderEncabezadoFiltrable('Estado', 'estado', 'select')}
+                <CTableHeaderCell scope="col" className="table-curso__head">
+                  Inscripción
+                </CTableHeaderCell>
                 <CTableHeaderCell scope="col" className="table-curso__head text-end">
                   Acciones
                 </CTableHeaderCell>
@@ -154,7 +167,7 @@ const CursoTable = ({
             <CTableBody>
               {cursos.length === 0 ? (
                 <CTableRow>
-                  <CTableDataCell colSpan={11} className="table-curso__empty-results">
+                  <CTableDataCell colSpan={12} className="table-curso__empty-results">
                     No se encontraron coincidencias
                   </CTableDataCell>
                 </CTableRow>
@@ -212,8 +225,30 @@ const CursoTable = ({
                           {curs.estado || 'Sin estado'}
                         </StatusBadge>
                       </CTableDataCell>
+                      <CTableDataCell className="table-curso__cell">
+                        <CBadge
+                          color={ESTADOS_INSCRIPCION[curs.estado_inscripcion]?.color || 'secondary'}
+                        >
+                          {ESTADOS_INSCRIPCION[curs.estado_inscripcion]?.texto || 'Sin datos'}
+                        </CBadge>
+                        <div className="small text-body-secondary mt-1">
+                          Hasta {formatearFechaIso(curs.fecha_limite_inscripcion, '---')} ·{' '}
+                          {curs.dias_plazo_efectivo} días
+                          {curs.origen_plazo === 'global' ? ' (global)' : ''}
+                        </div>
+                      </CTableDataCell>
                       <CTableDataCell className="table-curso__cell text-end">
                         <CButtonGroup size="sm">
+                          {puedeEditarPlazo && (
+                            <CButton
+                              color="info"
+                              variant="outline"
+                              onClick={() => setIdCursoPlazo(curs.id_curso)}
+                              className="curso-table__action"
+                            >
+                              Plazo
+                            </CButton>
+                          )}
                           <CButton
                             color="primary"
                             variant="outline"
@@ -287,6 +322,13 @@ const CursoTable = ({
           </CButton>
         </CModalFooter>
       </CModal>
+      {idCursoPlazo && (
+        <PlazoInscripcionModal
+          idCurso={idCursoPlazo}
+          onCerrar={() => setIdCursoPlazo(null)}
+          onGuardado={plazoGuardado}
+        />
+      )}
     </SectionCard>
   )
 }

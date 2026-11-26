@@ -1,0 +1,55 @@
+@api = http://localhost:5001
+@email = TEST_super@academia.test
+@password = {{$dotenv TEST_PASSWORD}}
+@token = pegar_access_token
+@idCurso = 1
+
+### Login
+POST {{api}}/login
+Content-Type: application/json
+
+{ "email": "{{email}}", "password": "{{password}}" }
+
+### Cambiar de rol
+POST {{api}}/cambiar-rol
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "role": "profesor" }
+
+### Perfil con permisos
+GET {{api}}/perfil
+Authorization: Bearer {{token}}
+
+### Plazo global
+GET {{api}}/admin/configuracion/plazo-inscripcion
+Authorization: Bearer {{token}}
+
+### Cambiar plazo global (solo super administrador)
+PUT {{api}}/admin/configuracion/plazo-inscripcion
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "dias": 15 }
+
+### Plazo de un curso
+GET {{api}}/admin/cursos/{{idCurso}}/plazo-inscripcion
+Authorization: Bearer {{token}}
+
+### Cambiar plazo de un curso (null vuelve al global)
+PUT {{api}}/admin/cursos/{{idCurso}}/plazo-inscripcion
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "dias": 20 }
+
+### Inscripción del estudiante
+POST {{api}}/estudiante/curso/inscripcion-a-un-curso/{{idCurso}}
+Authorization: Bearer {{token}}
+
+### Inscripción por administrador
+POST {{api}}/admin/inscripciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "idEstudiante": 1, "idCurso": [{{idCurso}}] }

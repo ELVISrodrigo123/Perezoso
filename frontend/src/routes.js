@@ -22,6 +22,9 @@ const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const PadresTutores = React.lazy(() => import('./views/padreTutor/PadreTutor'))
 const Estudiantes = React.lazy(() => import('./views/estudiantes/Estudiantes'))
 const Cursos = React.lazy(() => import('./views/cursos/Cursos'))
+const ConfiguracionAcademia = React.lazy(
+  () => import('./views/configuracion/ConfiguracionAcademia'),
+)
 const Profesores = React.lazy(() => import('./views/profesores/Profesores'))
 const Inscripciones = React.lazy(() => import('./views/inscripciones/Inscripciones'))
 const PreinscripcionEstudiante = React.lazy(
@@ -127,6 +130,13 @@ const routes = [
     name: 'Control de pagos',
     element: ControlPagosEstudiante,
     roles: ['administrador'],
+  },
+  {
+    path: '/admin/configuracion',
+    name: 'Configuración',
+    element: ConfiguracionAcademia,
+    roles: ['administrador'],
+    permiso: 'settings.enrollment_deadline.read',
   },
   {
     path: '/docente/cursos',

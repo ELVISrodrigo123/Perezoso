@@ -1,4 +1,5 @@
 import dataBase from '../../db/dataBase.js'
+import { COLUMNAS_ESTADO_INSCRIPCION, unirEstadoInscripcion } from './estadoInscripcionCurso.js'
 
 export const mostrarCursos = async ({ limit, offset, filtros = {} } = {}) => {
   const { curso, profesor, descripcion, duracion, precio, cupos, inicio, fin, estado } = filtros
@@ -40,9 +41,11 @@ export const mostrarCursos = async ({ limit, offset, filtros = {} } = {}) => {
   const dataResult = await dataBase.query(`
     SELECT cu.*,
     (pro.nombre || ' ' || pro.a_paterno) AS profesor_nombre,
-    (cu.fecha_creacion + cu.duracion) AS fecha_fin
+    (cu.fecha_creacion + cu.duracion) AS fecha_fin,
+    ${COLUMNAS_ESTADO_INSCRIPCION}
     FROM curso cu
     JOIN profesor pro ON pro.id_profesor = cu.id_profesor
+    ${unirEstadoInscripcion('cu')}
     ${where}
     ORDER BY cu.fecha_creacion DESC, cu.id_curso DESC
     LIMIT $${valores.length + 1} OFFSET $${valores.length + 2}`,

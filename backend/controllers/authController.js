@@ -7,6 +7,8 @@ import {
   obtenerCuentaPorId,
   obtenerRolesActivos
 } from '../models/modelsUsuarios/loginUsuario.js'
+import { obtenerPermisosDelRol } from '../models/modelsUsuarios/permisosUsuario.js'
+import { TIPO_ACCESS_TOKEN, TIPO_REFRESH_TOKEN } from '../middlewares/veriificarToken.js'
 
 dotenv.config({ path: './.env' })
 
@@ -15,9 +17,9 @@ const PRIORIDAD_ROLES = ['administrador', 'profesor', 'estudiante']
 const elegirRolPorDefecto = (roles) =>
   PRIORIDAD_ROLES.find((rol) => roles.includes(rol)) ?? roles[0]
 
-const crearAccessToken = (usuario, roles, role) => {
+const crearAccessToken = (usuario, roles, role, permisos) => {
   return jwt.sign(
-    { id: usuario.id_usuarios, email: usuario.email, role, roles },
+    { id: usuario.id_usuarios, email: usuario.email, role, roles, permisos, type: TIPO_ACCESS_TOKEN },
     process.env.JWT_SECRET,
     {
       expiresIn: '10m'
@@ -27,12 +29,18 @@ const crearAccessToken = (usuario, roles, role) => {
 
 const crearRefreshToken = (usuario, role) => {
   return jwt.sign(
-    { id: usuario.id_usuarios, email: usuario.email, role, type: 'refresh' },
+    { id: usuario.id_usuarios, email: usuario.email, role, type: TIPO_REFRESH_TOKEN },
     process.env.JWT_SECRET,
     {
       expiresIn: '7d'
     }
   )
+}
+
+const emitirSesion = async (res, usuario, roles, role) => {
+  const permisos = await obtenerPermisosDelRol(usuario.id_usuarios, role)
+  guardarRefreshTokenEnCookie(res, crearRefreshToken(usuario, role))
+  return crearAccessToken(usuario, roles, role, permisos)
 }
 
 const guardarRefreshTokenEnCookie = (res, token) => {
@@ -88,10 +96,7 @@ export const login = async (req, res) => {
 
     const role = roles.includes(rolSolicitado) ? rolSolicitado : elegirRolPorDefecto(roles)
 
-    const token = crearAccessToken(usuario, roles, role)
-    const refreshToken = crearRefreshToken(usuario, role)
-
-    guardarRefreshTokenEnCookie(res, refreshToken)
+    const token = await emitirSesion(res, usuario, roles, role)
 
     return res.json({ token })
   } catch (error) {
@@ -110,11 +115,10 @@ export const refreshToken = async (req, res) => {
 
     const payload = jwt.verify(tokenCookie, process.env.JWT_SECRET)
 
-    if (payload.type !== 'refresh') {
+    if (payload.type !== TIPO_REFRESH_TOKEN) {
       return res.status(401).json({ message: 'Refresh token inválido' })
     }
 
-    // Se consulta la BD: si al usuario le quitaron un rol o lo desactivaron, se nota aqui
     const cuenta = await obtenerCuentaPorId(payload.id)
     if (!cuenta || cuenta.estado !== 'Activo') {
       return res.status(401).json({ message: 'Cuenta inactiva' })
@@ -129,18 +133,12 @@ export const refreshToken = async (req, res) => {
 
     const usuario = { id_usuarios: cuenta.id_usuarios, email: cuenta.email }
 
-    const nuevoAccessToken = crearAccessToken(usuario, roles, role)
-    const nuevoRefreshToken = crearRefreshToken(usuario, role)
-
-    guardarRefreshTokenEnCookie(res, nuevoRefreshToken)
-
-    return res.json({ token: nuevoAccessToken })
+    return res.json({ token: await emitirSesion(res, usuario, roles, role) })
   } catch (error) {
     return res.status(401).json({ message: 'Refresh token inválido o expirado' })
   }
 }
 
-// Cambiar de rol sin volver a escribir la contraseña (requiere token valido)
 export const cambiarRol = async (req, res) => {
   try {
     const { role } = req.body
@@ -158,9 +156,7 @@ export const cambiarRol = async (req, res) => {
 
     const usuario = { id_usuarios: cuenta.id_usuarios, email: cuenta.email }
 
-    guardarRefreshTokenEnCookie(res, crearRefreshToken(usuario, role))
-
-    return res.json({ token: crearAccessToken(usuario, roles, role) })
+    return res.json({ token: await emitirSesion(res, usuario, roles, role) })
   } catch (error) {
     console.error(error)
     return res.status(500).json({ message: 'Error del servidor' })

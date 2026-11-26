@@ -139,14 +139,6 @@ const Inscripciones = () => {
     }
   }
 
-  const DIAS_PARA_INSCRIBIRSE = 10
-
-  const parsearFecha = (valor) => {
-    if (!valor) return null
-    const [anio, mes, dia] = String(valor).slice(0, 10).split('-').map(Number)
-    return new Date(anio, mes - 1, dia)
-  }
-
   return (
     <div className="inscripciones-page__container">
       <FeedbackAlert feedback={feedback} onClose={limpiarFeedback} />

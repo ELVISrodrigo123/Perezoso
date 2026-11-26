@@ -1,5 +1,7 @@
 import { obtenerDeudasEstudiante, crearInscripcionAunCurso, obtenerCalificacionesDelEstudiante, obtenerCursosNoInscritosDelEstudiante, obtenerCursosParaEstudiante, obtenerEstudiante } from '../../models/modelsGestionEstudiante/cursosEstudiante/obtenerCursosEstudiante.js'
 import { obtenerPaginacion, armarRespuestaPaginada } from '../../utils/paginacion.js'
+import dataBase from '../../db/dataBase.js'
+import { ErrorInscripcion, responderErrorInscripcion, validarInscripcionACurso } from '../../services/validarInscripcion.js'
 
 export const getMostrarDeudasEstudiante = async (req, res) => {
   try {
@@ -49,20 +51,34 @@ export const getMostrarCursosNoInscritosDelEstudiante = async (req, res) => {
 }
 
 export const postCrearInscripcionAunCursoestudiante = async (req, res) => {
+  const client = await dataBase.connect()
   try {
-    const { idCurso } = req.params
-    const idUsuario = req.user.id
-    const idEstudiante = await obtenerEstudiante(idUsuario)
-    const informe = await crearInscripcionAunCurso(idEstudiante, idCurso)
+    const idCurso = Number(req.params.idCurso)
+    const idEstudiante = await obtenerEstudiante(req.user.id)
+    if (!idEstudiante) {
+      return res.status(404).json({ message: 'No se encontró el perfil de estudiante' })
+    }
+
+    await client.query('BEGIN')
+    await validarInscripcionACurso(idCurso, client)
+    const informe = await crearInscripcionAunCurso(idEstudiante, idCurso, client)
     if (informe.rowCount === 0) {
+      await client.query('ROLLBACK')
       return res.status(400).json({ message: 'No se pudo realizar la inscripción' })
     }
+    await client.query('COMMIT')
     return res.status(201).json({ message: 'Inscripción realizada correctamente' })
   } catch (error) {
-    console.error(error)
+    await client.query('ROLLBACK').catch(() => {})
+    if (error instanceof ErrorInscripcion) {
+      return responderErrorInscripcion(res, error)
+    }
     if (error.code === '23505') {
       return res.status(400).json({ message: 'Ya estás inscrito en este curso' })
     }
+    console.error(error)
     return res.status(500).json({ message: 'Error interno servidor' })
+  } finally {
+    client.release()
   }
 }
