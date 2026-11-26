@@ -22,8 +22,8 @@ import React, { Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { CContainer, CSpinner } from '@coreui/react'
 
-import ProteccionRol from './proteccionRol'
-import { obtenerRutaPrincipal } from '../views/utils/usuario'
+import ProteccionPermiso from './ProteccionPermiso'
+import { obtenerRutaPrincipal } from '../views/utils/rutaPrincipal'
 
 // routes config
 import routes from '../routes'
@@ -47,10 +47,10 @@ const AppContent = () => {
         <Routes>
           {routes.map((route) => {
             const Element = route.element
-            const contenido = route.roles ? (
-              <ProteccionRol rolesPermitidos={route.roles} permiso={route.permiso}>
+            const contenido = route.permiso ? (
+              <ProteccionPermiso permiso={route.permiso}>
                 <Element />
-              </ProteccionRol>
+              </ProteccionPermiso>
             ) : (
               <Element />
             )

@@ -1,4 +1,5 @@
 import dataBase from '../../db/dataBase.js'
+import { columnaRolesActivos } from '../modelsUsuarios/rolesDeCuenta.js'
 
 export const obtenerAdministradores = async ({ limit, offset, filtros = {} } = {}, db = dataBase) => {
   const { administrador, ci, telefono, email, registro, estado } = filtros
@@ -26,7 +27,7 @@ export const obtenerAdministradores = async ({ limit, offset, filtros = {} } = {
     ${where}`, valores)
 
   const dataResult = await db.query(`
-    SELECT adm.*, ur.estado, adm.id_usuarios AS id_cuenta
+    SELECT adm.*, ur.estado, adm.id_usuarios AS id_cuenta, ${columnaRolesActivos('adm.id_usuarios')}
     FROM administradores adm
     JOIN usuario_roles ur ON ur.id_usuario = adm.id_usuarios AND ur.role = 'administrador'
     ${where}

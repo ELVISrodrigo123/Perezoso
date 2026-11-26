@@ -1,25 +1,24 @@
 import dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import {
-  habilitarUsuario,
-  loginUsuario,
-  obtenerCuentaPorId,
-  obtenerRolesActivos
-} from '../models/modelsUsuarios/loginUsuario.js'
-import { obtenerPermisosDelRol } from '../models/modelsUsuarios/permisosUsuario.js'
+import { habilitarUsuario, loginUsuario } from '../models/modelsUsuarios/loginUsuario.js'
+import { obtenerAccesoEfectivo } from '../models/modelsUsuarios/permisosUsuario.js'
 import { TIPO_ACCESS_TOKEN, TIPO_REFRESH_TOKEN } from '../middlewares/veriificarToken.js'
 
 dotenv.config({ path: './.env' })
 
-const PRIORIDAD_ROLES = ['administrador', 'profesor', 'estudiante']
+const MENSAJE_INACTIVO = 'Tu cuenta se encuentra inactiva. Por favor, contacta al administrador.'
 
-const elegirRolPorDefecto = (roles) =>
-  PRIORIDAD_ROLES.find((rol) => roles.includes(rol)) ?? roles[0]
-
-const crearAccessToken = (usuario, roles, role, permisos) => {
+const crearAccessToken = (acceso) => {
   return jwt.sign(
-    { id: usuario.id_usuarios, email: usuario.email, role, roles, permisos, type: TIPO_ACCESS_TOKEN },
+    {
+      id: acceso.id,
+      email: acceso.email,
+      roles: acceso.roles,
+      permissions: acceso.permissions,
+      permissions_version: acceso.version,
+      type: TIPO_ACCESS_TOKEN
+    },
     process.env.JWT_SECRET,
     {
       expiresIn: '10m'
@@ -27,9 +26,9 @@ const crearAccessToken = (usuario, roles, role, permisos) => {
   )
 }
 
-const crearRefreshToken = (usuario, role) => {
+const crearRefreshToken = (acceso) => {
   return jwt.sign(
-    { id: usuario.id_usuarios, email: usuario.email, role, type: TIPO_REFRESH_TOKEN },
+    { id: acceso.id, email: acceso.email, type: TIPO_REFRESH_TOKEN },
     process.env.JWT_SECRET,
     {
       expiresIn: '7d'
@@ -37,10 +36,11 @@ const crearRefreshToken = (usuario, role) => {
   )
 }
 
-const emitirSesion = async (res, usuario, roles, role) => {
-  const permisos = await obtenerPermisosDelRol(usuario.id_usuarios, role)
-  guardarRefreshTokenEnCookie(res, crearRefreshToken(usuario, role))
-  return crearAccessToken(usuario, roles, role, permisos)
+const tieneAcceso = (acceso) => acceso && acceso.estado === 'Activo' && (acceso.esSuper || acceso.roles.length > 0)
+
+const emitirSesion = (res, acceso) => {
+  guardarRefreshTokenEnCookie(res, crearRefreshToken(acceso))
+  return crearAccessToken(acceso)
 }
 
 const guardarRefreshTokenEnCookie = (res, token) => {
@@ -68,7 +68,7 @@ const leerCookie = (req, nombre) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password, role: rolSolicitado } = req.body
+    const { email, password } = req.body
     const result = await loginUsuario(email)
 
     if (!result.rows.length) {
@@ -82,23 +82,13 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: 'Usuario o contraseña incorrecta' })
     }
 
-    const mensajeInactivo = 'Tu cuenta se encuentra inactiva. Por favor, contacta al administrador.'
+    const acceso = await obtenerAccesoEfectivo(usuario.id_usuarios)
 
-    if (usuario.estado !== 'Activo') {
-      return res.status(403).json({ message: mensajeInactivo })
+    if (!tieneAcceso(acceso)) {
+      return res.status(403).json({ message: MENSAJE_INACTIVO })
     }
 
-    const roles = await obtenerRolesActivos(usuario.id_usuarios)
-
-    if (!roles.length) {
-      return res.status(403).json({ message: mensajeInactivo })
-    }
-
-    const role = roles.includes(rolSolicitado) ? rolSolicitado : elegirRolPorDefecto(roles)
-
-    const token = await emitirSesion(res, usuario, roles, role)
-
-    return res.json({ token })
+    return res.json({ token: emitirSesion(res, acceso) })
   } catch (error) {
     console.error(error)
     return res.status(500).json({ message: 'Error del servidor' })
@@ -119,55 +109,19 @@ export const refreshToken = async (req, res) => {
       return res.status(401).json({ message: 'Refresh token inválido' })
     }
 
-    const cuenta = await obtenerCuentaPorId(payload.id)
-    if (!cuenta || cuenta.estado !== 'Activo') {
-      return res.status(401).json({ message: 'Cuenta inactiva' })
+    const acceso = await obtenerAccesoEfectivo(payload.id)
+    if (!tieneAcceso(acceso)) {
+      return res.status(401).json({ message: 'Cuenta inactiva o sin roles activos' })
     }
 
-    const roles = await obtenerRolesActivos(payload.id)
-    if (!roles.length) {
-      return res.status(401).json({ message: 'Sin roles activos' })
-    }
-
-    const role = roles.includes(payload.role) ? payload.role : elegirRolPorDefecto(roles)
-
-    const usuario = { id_usuarios: cuenta.id_usuarios, email: cuenta.email }
-
-    return res.json({ token: await emitirSesion(res, usuario, roles, role) })
+    return res.json({ token: emitirSesion(res, acceso) })
   } catch (error) {
     return res.status(401).json({ message: 'Refresh token inválido o expirado' })
   }
 }
 
-export const cambiarRol = async (req, res) => {
-  try {
-    const { role } = req.body
-
-    const cuenta = await obtenerCuentaPorId(req.user.id)
-    if (!cuenta || cuenta.estado !== 'Activo') {
-      return res.status(403).json({ message: 'Cuenta inactiva' })
-    }
-
-    const roles = await obtenerRolesActivos(req.user.id)
-
-    if (!roles.includes(role)) {
-      return res.status(403).json({ message: 'No tienes ese rol asignado o está inactivo' })
-    }
-
-    const usuario = { id_usuarios: cuenta.id_usuarios, email: cuenta.email }
-
-    return res.json({ token: await emitirSesion(res, usuario, roles, role) })
-  } catch (error) {
-    console.error(error)
-    return res.status(500).json({ message: 'Error del servidor' })
-  }
-}
-
 export const putHabilitarUsuario = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const { idUsuario } = req.params
     const { role } = req.query
     if (!['estudiante', 'profesor', 'administrador'].includes(role)) {

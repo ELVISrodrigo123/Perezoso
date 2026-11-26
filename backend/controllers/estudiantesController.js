@@ -2,6 +2,7 @@ import dataBase from '../db/dataBase.js'
 import bcrypt from 'bcryptjs'
 import { resolverUsuarioParaRol } from '../models/modelsUsuarios/crearUsuario.js'
 import { obtenerPaginacion, armarRespuestaPaginada } from '../utils/paginacion.js'
+import { columnaRolesActivos } from '../models/modelsUsuarios/rolesDeCuenta.js'
 
 export const getEstudiantes = async (req, res) => {
   try {
@@ -33,7 +34,7 @@ export const getEstudiantes = async (req, res) => {
     const total = parseInt(totalResult.rows[0].count, 10)
 
     const dataResult = await dataBase.query(`
-      SELECT est.*, ur.estado, est.id_usuario AS id_cuenta
+      SELECT est.*, ur.estado, est.id_usuario AS id_cuenta, ${columnaRolesActivos('est.id_usuario')}
       FROM estudiante est
       JOIN usuario_roles ur ON ur.id_usuario = est.id_usuario AND ur.role = 'estudiante'
       ${where}
@@ -90,15 +91,13 @@ export const postEstudiante = async (req, res) => {
     }
 
     const { idUsuario, reutilizado } = await resolverUsuarioParaRol(datos, client)
-    console.log(`id usuario: ${idUsuario}`)
-    const result = await client.query(
+    await client.query(
     `INSERT INTO estudiante 
     (nombre, a_paterno, a_materno, ci, direccion, telefono, email, id_usuario, colegio, id_tutor)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING *`,
     [nombre, apellidoPaterno, apellidoMaterno, ci, direccion, telefono, emailFinal, idUsuario, colegio, idTutor]
     )
     await client.query('COMMIT')
-    console.log(result.rows, 'llego aqui y debe motrar los datos insertados')
     return res.status(201).json({
       message: reutilizado
         ? 'Este usuario ya existía: se le agregó el rol de estudiante con su misma cuenta'
@@ -109,7 +108,7 @@ export const postEstudiante = async (req, res) => {
     })
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {})
-    console.log(error)
+    console.error(error)
     if (error.esNegocio) {
       return res.status(400).json({ error: error.codigo, message: error.message })
     }
@@ -228,7 +227,6 @@ export const putEstudiante = async (req, res) => {
     [nombre, apellidoPaterno, apellidoMaterno, ci, direccion, telefono, emailFinal, colegio, idTutor, id])
 
     await client.query('COMMIT')
-    console.log(actualizarEstudiante.rows[0], 'se deberia actualizar')
     res.json(actualizarEstudiante.rows[0])
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {})

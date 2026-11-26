@@ -5,9 +5,6 @@ import { ErrorInscripcion, responderErrorInscripcion, validarInscripcionACurso }
 
 export const getMostrarDeudasEstudiante = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'estudiante') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los estudiantes pueden acceder a esta información.' })
-    }
     const informe = await obtenerDeudasEstudiante(req.user.id)
     return res.status(200).json({ datos: informe.rows })
   } catch (error) {

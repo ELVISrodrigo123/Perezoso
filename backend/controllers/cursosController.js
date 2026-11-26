@@ -6,9 +6,6 @@ import { obtenerPaginacion, armarRespuestaPaginada } from '../utils/paginacion.j
 
 export const getMostrarCursosPorVencer = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const cursosPorVencer = await mostrarCursosPorVencer()
     return res.status(200).json({ cursosPorVencer })
   } catch (error) {
@@ -19,9 +16,6 @@ export const getMostrarCursosPorVencer = async (req, res) => {
 
 export const getCursos = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const { page, limit, offset } = obtenerPaginacion(req.query)
     const { filas, total } = await mostrarCursos({ limit, offset, filtros: req.query })
     res.json(armarRespuestaPaginada(filas, total, page, limit))
@@ -33,9 +27,6 @@ export const getCursos = async (req, res) => {
 
 export const postCursos = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const resultado = await crearCursos(req.body)
     res.status(201).json(resultado)
   } catch (error) {
@@ -46,9 +37,6 @@ export const postCursos = async (req, res) => {
 
 export const putCursos = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const { id } = req.params
     const { idProfesor } = req.body
     if (idProfesor) {
@@ -73,7 +61,6 @@ export const putCursos = async (req, res) => {
     if (!actualizar) {
       return res.status(404).json({ message: 'El curso no existe' })
     }
-    console.log(actualizar, ' se deberia actulizar cursos')
     res.json(actualizar)
   } catch (error) {
     console.error(error)
@@ -83,9 +70,6 @@ export const putCursos = async (req, res) => {
 
 export const deleteCurso = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const { id } = req.params
     const result = await dataBase.query(`
       SELECT estado 

@@ -2,6 +2,7 @@ import dataBase from '../db/dataBase.js'
 import bcrypt from 'bcryptjs'
 import { resolverUsuarioParaRol } from '../models/modelsUsuarios/crearUsuario.js'
 import { obtenerPaginacion, armarRespuestaPaginada } from '../utils/paginacion.js'
+import { columnaRolesActivos } from '../models/modelsUsuarios/rolesDeCuenta.js'
 
 export const getProfesor = async (req, res) => {
   try {
@@ -33,7 +34,7 @@ export const getProfesor = async (req, res) => {
     const total = parseInt(totalResult.rows[0].count, 10)
 
     const dataResult = await dataBase.query(`
-      SELECT pro.*, ur.estado, pro.id_usuario AS id_cuenta
+      SELECT pro.*, ur.estado, pro.id_usuario AS id_cuenta, ${columnaRolesActivos('pro.id_usuario')}
       FROM profesor pro
       JOIN usuario_roles ur ON ur.id_usuario = pro.id_usuario AND ur.role = 'profesor'
       ${where}
@@ -98,15 +99,13 @@ export const postProfesor = async (req, res) => {
 
     const { idUsuario, reutilizado } = await resolverUsuarioParaRol(datos, client)
 
-    console.log(req.body, 'aqui mostarndo frontend')
-    const result = await client.query(
+    await client.query(
     `INSERT INTO profesor
     (nombre, a_paterno, a_materno, ci, telefono, email, especialidad, id_usuario)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
     [nombre, apellidoPaterno, apellidoMaterno, ci, telefono, emailFinal, especialidad, idUsuario])
 
     await client.query('COMMIT')
-    console.log(result.rows)
     res.status(201).json({
       message: reutilizado
         ? 'Este usuario ya existía: se le agregó el rol de profesor con su misma cuenta'
@@ -232,7 +231,6 @@ export const putProfesor = async (req, res) => {
     )
 
     await client.query('COMMIT')
-    console.log(actualizarProfesor.rows[0], 'se deberia actualizar')
     res.status(200).json(actualizarProfesor.rows[0])
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {})

@@ -49,7 +49,6 @@ export const postPreinscripcionEstudiante = async (req, res) => {
     if (!datos) {
       return res.status(400).json({ message: 'No se pudo registrar la preinscripcion' })
     }
-    console.log(datos, 'mostrando los datos preinscripcion')
     return res.status(201).json('Datos enviado al administrador')
   } catch (error) {
     if (error.code === '23505') {

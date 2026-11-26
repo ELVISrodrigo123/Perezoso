@@ -16,22 +16,15 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { postLogin, postCambiarRol } from '../../../services/autorizacionRoutes'
+import { postLogin } from '../../../services/autorizacionRoutes'
 import { setAccessToken, clearAccessToken } from '../../../services/authSession'
-import { obtenerRutaPrincipal, obtenerUsuario } from '../../utils/usuario'
+import { obtenerRutaPrincipal } from '../../utils/rutaPrincipal'
 
 const Login = () => {
   const navigate = useNavigate()
   const [formulario, setFormulario] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
-
-  const [rolesDisponibles, setRolesDisponibles] = useState([])
-  const etiquetasRol = {
-    administrador: 'Administrador',
-    profesor: 'Profesor',
-    estudiante: 'Estudiante',
-  }
 
   const handleChange = (event) => {
     setFormulario({ ...formulario, [event.target.name]: event.target.value })
@@ -45,36 +38,16 @@ const Login = () => {
     try {
       const respuesta = await postLogin(formulario)
       setAccessToken(respuesta.data.token)
-      const roles = obtenerUsuario()?.roles || []
-      if (roles.length > 1) {
-        setRolesDisponibles(roles)
-        return
-      }
-
       const rutaPrincipal = obtenerRutaPrincipal()
       if (!rutaPrincipal) {
         clearAccessToken()
-        setError('El rol del usuario no tiene una ruta asignada')
+        setError('Tu cuenta no tiene ninguna sección habilitada. Consulta con la administración.')
         return
       }
 
       navigate(rutaPrincipal, { replace: true })
     } catch (loginError) {
       setError(loginError.response?.data?.message || 'No fue posible iniciar sesión')
-    } finally {
-      setCargando(false)
-    }
-  }
-
-  const elegirRol = async (role) => {
-    setError('')
-    setCargando(true)
-    try {
-      const respuesta = await postCambiarRol(role)
-      setAccessToken(respuesta.data.token)
-      navigate(obtenerRutaPrincipal() || '/login', { replace: true })
-    } catch (rolError) {
-      setError(rolError.response?.data?.message || 'No fue posible cambiar de rol')
     } finally {
       setCargando(false)
     }
@@ -88,31 +61,7 @@ const Login = () => {
             <CCardGroup className="login-card-group">
               <CCard className="login-card login-card--form">
                 <CCardBody className="login-card__body">
-                  {rolesDisponibles.length > 0 && (
-                    <div className="login-header">
-                      <span className="login-header__eyebrow">Plataforma académica</span>
-                      <h1>Entrar como…</h1>
-                      <p className="login-subtitle">Tu cuenta tiene más de un rol</p>
-                      {error && (
-                        <CAlert className="login-alert" color="danger">
-                          {error}
-                        </CAlert>
-                      )}
-                      <div className="d-grid gap-2 mt-3">
-                        {rolesDisponibles.map((rol) => (
-                          <CButton
-                            key={rol}
-                            className="login-submit"
-                            disabled={cargando}
-                            onClick={() => elegirRol(rol)}
-                          >
-                            {etiquetasRol[rol] || rol}
-                          </CButton>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <CForm onSubmit={handleSubmit} hidden={rolesDisponibles.length > 0}>
+                  <CForm onSubmit={handleSubmit}>
                     <div className="login-header">
                       <span className="login-header__eyebrow">Plataforma académica</span>
                       <h1>Iniciar sesión</h1>

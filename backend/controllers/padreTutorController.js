@@ -4,9 +4,6 @@ import { obtenerPaginacion, armarRespuestaPaginada } from '../utils/paginacion.j
 
 export const getPadresTutors = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const { page, limit, offset } = obtenerPaginacion(req.query)
     const { filas, total } = await obtenerPadresTutors({ limit, offset, filtros: req.query })
     return res.status(200).json(armarRespuestaPaginada(filas, total, page, limit))
@@ -18,9 +15,6 @@ export const getPadresTutors = async (req, res) => {
 
 export const postPadreTutor = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const nuevoPadreTutor = await registrarPadreTutor(req.body)
     if (nuevoPadreTutor.rowCount === 0) {
       return res.status(400).json({ message: 'No se pudo registrar el padre/tutor.' })
@@ -37,9 +31,6 @@ export const postPadreTutor = async (req, res) => {
 
 export const putPadreTutor = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const { id } = req.params
     const resultado = await actualizarPadreTutor(id, req.body)
     if (resultado.rowCount === 0) {
@@ -59,12 +50,6 @@ export const deletePadreTutor = async (req, res) => {
   const client = await dataBase.connect()
 
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({
-        message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.'
-      })
-    }
-
     const { id } = req.params
 
     await client.query('BEGIN')

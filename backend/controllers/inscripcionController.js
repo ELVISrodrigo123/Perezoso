@@ -165,9 +165,6 @@ export const deleteinscripcionPorEstudiante = async (req, res) => {
 
 export const deleteEliminarTodasInscripcionesDelCurso = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden eliminar inscripciones de un curso.' })
-    }
     const { idCurso } = req.params
     const result = await eliminarTodasInscripcionesDelCurso(idCurso)
     if (result.rowCount === 0) {

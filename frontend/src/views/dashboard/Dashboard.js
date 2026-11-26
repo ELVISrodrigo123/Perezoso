@@ -13,7 +13,7 @@ import {
   getEstudiantesProfesor,
 } from '../../services/gestionProfesor/gestionprofesCursos'
 import { getMostrarCursosEstudiante } from '../../services/gestionEstudiante/cursosEstudiante'
-import { obtenerRol } from '../utils/usuario'
+import { obtenerPermisos } from '../utils/usuario'
 
 const mockMetricas = {
   administrador: {
@@ -30,112 +30,145 @@ const mockMetricas = {
 }
 
 const Dashboard = () => {
-  const rol = obtenerRol()
   const navigate = useNavigate()
   const [metricas, setMetricas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [cursosPorVencer, setCursosPorVencer] = useState([])
-
-  const rutasPorRol = {
-    administrador: {
-      'Total Estudiantes': '/admin/estudiantes',
-      'Ingresos del Mes': '/admin/recibos',
-      'Preinscripciones Pendientes': '/admin/preinscripciones',
-      'Pagos Vencidos': '/admin/control-pagos',
-    },
-    profesor: {
-      'Mis Cursos Asignados': '/docente/cursos',
-      'Total Alumnos a Cargo': '/docente/estudiantes',
-      'Evaluaciones Pendientes de Calificar': '/docente/evaluaciones',
-      'Promedio de Asistencia': '/docente/estudiantes',
-    },
-    estudiante: {
-      'Mis Cursos': '/estudiante/cursos',
-      'Mi Promedio General': '/estudiante/cursos',
-      'Próximos Exámenes': '/estudiante/cursos',
-      'Estado de Cuenta': '/estudiante/cursos',
-    },
-  }
+  const permisos = obtenerPermisos()
+  const clavePermisos = permisos.join(',')
+  const puede = (permiso) => permisos.includes(permiso)
 
   useEffect(() => {
     let componenteActivo = true
+    const tiene = (permiso) => clavePermisos.split(',').includes(permiso)
+
+    const bloques = []
+    if (tiene('menu.students.view')) {
+      bloques.push(async () => {
+        const estudiantes = await getEstudiantes()
+        return [
+          {
+            color: 'primary',
+            title: 'Total Estudiantes',
+            value: estudiantes.data.length,
+            ruta: '/admin/estudiantes',
+          },
+        ]
+      })
+    }
+    if (tiene('menu.receipts.view')) {
+      bloques.push(async () => [
+        {
+          color: 'info',
+          title: 'Ingresos del Mes',
+          value: mockMetricas.administrador.ingresos,
+          ruta: '/admin/recibos',
+        },
+      ])
+    }
+    if (tiene('menu.preregistrations.view')) {
+      bloques.push(async () => {
+        const preinscripciones = await getPreinscripcionEstudiante()
+        return [
+          {
+            color: 'warning',
+            title: 'Preinscripciones Pendientes',
+            value: preinscripciones.data.length,
+            ruta: '/admin/preinscripciones',
+          },
+        ]
+      })
+    }
+    if (tiene('menu.payments.view')) {
+      bloques.push(async () => {
+        const pagos = await getControlDePagosParaLosEstudiante()
+        return [
+          {
+            color: 'danger',
+            title: 'Pagos Vencidos',
+            value: pagos.data.length,
+            ruta: '/admin/control-pagos',
+          },
+        ]
+      })
+    }
+    if (tiene('menu.teaching.courses.view')) {
+      bloques.push(async () => {
+        const cursos = await getCursosProfesor()
+        return [
+          {
+            color: 'primary',
+            title: 'Mis Cursos Asignados',
+            value: cursos.data.length,
+            ruta: '/docente/cursos',
+          },
+        ]
+      })
+    }
+    if (tiene('menu.teaching.students.view')) {
+      bloques.push(async () => {
+        const estudiantes = await getEstudiantesProfesor()
+        return [
+          {
+            color: 'info',
+            title: 'Total Alumnos a Cargo',
+            value: estudiantes.data.length,
+            ruta: '/docente/estudiantes',
+          },
+        ]
+      })
+    }
+    if (tiene('menu.teaching.evaluations.view')) {
+      bloques.push(async () => {
+        const evaluaciones = await getCursosEvaluacionProfesor()
+        return [
+          {
+            color: 'warning',
+            title: 'Evaluaciones Pendientes de Calificar',
+            value: evaluaciones.data.length,
+            ruta: '/docente/evaluaciones',
+          },
+        ]
+      })
+    }
+    if (tiene('menu.learning.courses.view')) {
+      bloques.push(async () => {
+        const cursos = await getMostrarCursosEstudiante()
+        return [
+          {
+            color: 'primary',
+            title: 'Mis Cursos',
+            value: cursos.data.length,
+            ruta: '/estudiante/cursos',
+          },
+          {
+            color: 'info',
+            title: 'Mi Promedio General',
+            value: mockMetricas.estudiante.promedio,
+            ruta: '/estudiante/cursos',
+          },
+          {
+            color: 'warning',
+            title: 'Próximos Exámenes',
+            value: mockMetricas.estudiante.examenes,
+            ruta: '/estudiante/cursos',
+          },
+          {
+            color: 'danger',
+            title: 'Estado de Cuenta',
+            value: mockMetricas.estudiante.cuenta,
+            ruta: '/estudiante/cursos',
+          },
+        ]
+      })
+    }
 
     const cargarMetricas = async () => {
       setCargando(true)
-
-      try {
-        let metricasPorRol = []
-
-        if (rol === 'administrador') {
-          const [estudiantes, preinscripciones, pagos] = await Promise.all([
-            getEstudiantes(),
-            getPreinscripcionEstudiante(),
-            getControlDePagosParaLosEstudiante(),
-          ])
-
-          metricasPorRol = [
-            { color: 'primary', title: 'Total Estudiantes', value: estudiantes.data.length },
-            {
-              color: 'info',
-              title: 'Ingresos del Mes',
-              value: mockMetricas.administrador.ingresos,
-            },
-            {
-              color: 'warning',
-              title: 'Preinscripciones Pendientes',
-              value: preinscripciones.data.length,
-            },
-            { color: 'danger', title: 'Pagos Vencidos', value: pagos.data.length },
-          ]
-        } else if (rol === 'profesor') {
-          const [cursos, estudiantes, evaluaciones] = await Promise.all([
-            getCursosProfesor(),
-            getEstudiantesProfesor(),
-            getCursosEvaluacionProfesor(),
-          ])
-
-          metricasPorRol = [
-            { color: 'primary', title: 'Mis Cursos Asignados', value: cursos.data.length },
-            { color: 'info', title: 'Total Alumnos a Cargo', value: estudiantes.data.length },
-            {
-              color: 'warning',
-              title: 'Evaluaciones Pendientes de Calificar',
-              value: evaluaciones.data.length,
-            },
-            {
-              color: 'danger',
-              title: 'Promedio de Asistencia',
-              value: mockMetricas.profesor.asistencia,
-            },
-          ]
-        } else if (rol === 'estudiante') {
-          const cursos = await getMostrarCursosEstudiante()
-
-          metricasPorRol = [
-            { color: 'primary', title: 'Mis Cursos', value: cursos.data.length },
-            {
-              color: 'info',
-              title: 'Mi Promedio General',
-              value: mockMetricas.estudiante.promedio,
-            },
-            {
-              color: 'warning',
-              title: 'Próximos Exámenes',
-              value: mockMetricas.estudiante.examenes,
-            },
-            { color: 'danger', title: 'Estado de Cuenta', value: mockMetricas.estudiante.cuenta },
-          ]
-        }
-
-        if (componenteActivo) {
-          setMetricas(metricasPorRol)
-        }
-      } catch (error) {
-        console.error('Error al cargar métricas académicas', error)
-      } finally {
-        if (componenteActivo) {
-          setCargando(false)
-        }
+      const resultados = await Promise.allSettled(bloques.map((bloque) => bloque()))
+      if (componenteActivo) {
+        setMetricas(resultados.filter((r) => r.status === 'fulfilled').flatMap((r) => r.value))
+        setCargando(false)
       }
     }
 
@@ -144,10 +177,10 @@ const Dashboard = () => {
     return () => {
       componenteActivo = false
     }
-  }, [rol])
+  }, [clavePermisos])
 
   useEffect(() => {
-    if (rol !== 'administrador') return
+    if (!clavePermisos.split(',').includes('menu.courses.view')) return
 
     let componenteActivo = true
 
@@ -172,7 +205,7 @@ const Dashboard = () => {
     return () => {
       componenteActivo = false
     }
-  }, [rol])
+  }, [clavePermisos])
 
   if (cargando) {
     return <CSpinner color="primary" />
@@ -180,7 +213,7 @@ const Dashboard = () => {
 
   return (
     <>
-      {rol === 'administrador' && cursosPorVencer.length > 0 && (
+      {puede('menu.courses.view') && cursosPorVencer.length > 0 && (
         <div className="dashboard-alerts__section">
           <div className="dashboard-alerts__header">
             <h6 className="dashboard-alerts__title">Cursos próximos a vencer</h6>
@@ -202,7 +235,7 @@ const Dashboard = () => {
       <br />
       <CRow className="mb-4" xs={{ gutter: 4 }}>
         {metricas.map((metrica, index) => {
-          const ruta = rutasPorRol[rol]?.[metrica.title]
+          const ruta = metrica.ruta
 
           return (
             <CCol key={metrica.title} sm={6} xl={4} xxl={3}>
@@ -210,7 +243,8 @@ const Dashboard = () => {
                 color={metrica.color}
                 value={
                   <>
-                    {metrica.value} <CIcon icon={[cilPeople, cilCash, cilTask, cilBook][index]} />
+                    {metrica.value}{' '}
+                    <CIcon icon={[cilPeople, cilCash, cilTask, cilBook][index % 4]} />
                   </>
                 }
                 title={metrica.title}

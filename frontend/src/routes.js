@@ -77,96 +77,100 @@ const Administradores = React.lazy(
  * @example
  * // Route with exact match required
  * { path: '/base', name: 'Base', element: Cards, exact: true }
- */ GestionAccesos
+ */
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/dashboard', name: 'Dashboard', element: Dashboard, permiso: 'menu.dashboard.view' },
   {
     path: '/admin/accesos',
     name: 'Gestion de accesos',
     element: GestionAccesos,
-    roles: ['administrador'],
+    permiso: 'menu.access.view',
   },
   {
     path: '/admin/administradores',
     name: 'Administradores',
     element: Administradores,
-    roles: ['administrador'],
+    permiso: 'menu.admins.view',
   },
   {
     path: '/admin/recibos',
     name: 'Registro de Recibos',
     element: Recibos,
-    roles: ['administrador'],
+    permiso: 'menu.receipts.view',
   },
   {
     path: '/admin/padres-tutores',
     name: 'Padres y Tutores',
     element: PadresTutores,
-    roles: ['administrador'],
+    permiso: 'menu.guardians.view',
   },
   {
     path: '/admin/estudiantes',
     name: 'Estudiantes',
     element: Estudiantes,
-    roles: ['administrador'],
+    permiso: 'menu.students.view',
   },
-  { path: '/admin/cursos', name: 'Cursos', element: Cursos, roles: ['administrador'] },
-  { path: '/admin/profesores', name: 'Profesores', element: Profesores, roles: ['administrador'] },
+  { path: '/admin/cursos', name: 'Cursos', element: Cursos, permiso: 'menu.courses.view' },
+  {
+    path: '/admin/profesores',
+    name: 'Profesores',
+    element: Profesores,
+    permiso: 'menu.teachers.view',
+  },
   {
     path: '/admin/inscripciones',
     name: 'Inscripciones',
     element: Inscripciones,
-    roles: ['administrador'],
+    permiso: 'menu.enrollments.view',
   },
   {
     path: '/admin/preinscripciones',
     name: 'Preinscripciones',
     element: PreinscripcionEstudiante,
-    roles: ['administrador'],
+    permiso: 'menu.preregistrations.view',
   },
   {
     path: '/admin/control-pagos',
     name: 'Control de pagos',
     element: ControlPagosEstudiante,
-    roles: ['administrador'],
+    permiso: 'menu.payments.view',
   },
   {
     path: '/admin/configuracion',
     name: 'Configuración',
     element: ConfiguracionAcademia,
-    roles: ['administrador'],
-    permiso: 'settings.enrollment_deadline.read',
+    permiso: 'menu.settings.view',
   },
   {
     path: '/docente/cursos',
     name: 'Mis cursos',
     element: MostrarCursosProfesor,
-    roles: ['profesor'],
+    permiso: 'menu.teaching.courses.view',
   },
   {
     path: '/docente/estudiantes',
     name: 'Mis estudiantes',
     element: MostrarEstudiantesProfesor,
-    roles: ['profesor'],
+    permiso: 'menu.teaching.students.view',
   },
   {
     path: '/docente/evaluaciones',
     name: 'Evaluaciones',
     element: CursosEvaluacionProfesor,
-    roles: ['profesor'],
+    permiso: 'menu.teaching.evaluations.view',
   },
   {
     path: '/estudiante/preinscripciones',
     name: 'Inscribirme a cursos',
     element: PreinscripcionCursosEstudiante,
-    roles: ['estudiante'],
+    permiso: 'menu.learning.enroll.view',
   },
   {
     path: '/estudiante/cursos',
     name: 'Mis cursos y resultados',
     element: CursosResultadosEstudiante,
-    roles: ['estudiante'],
+    permiso: 'menu.learning.courses.view',
   },
 ]
 

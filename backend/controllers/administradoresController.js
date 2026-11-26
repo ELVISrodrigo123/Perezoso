@@ -25,28 +25,7 @@ const mensajesDuplicado = {
   uq_admin_email: 'El correo electrónico ya está registrado para otro administrador.'
 }
 
-// Solo el super administrador (administradores.es_super = true) puede gestionar administradores
-const soloSuperAdministrador = async (req, res) => {
-  if (!req.user || req.user.role !== 'administrador') {
-    res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    return false
-  }
-  try {
-    const idUsuario = req.user.id_usuarios ?? req.user.id
-    if (!idUsuario || !(await esSuperAdministrador(idUsuario))) {
-      res.status(403).json({ message: 'Acceso denegado. Solo el super administrador puede gestionar administradores.' })
-      return false
-    }
-    return true
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'Error interno del servidor' })
-    return false
-  }
-}
-
 export const getAdministradores = async (req, res) => {
-  if (!(await soloSuperAdministrador(req, res))) return
   try {
     const { page, limit, offset } = obtenerPaginacion(req.query)
     const { filas, total } = await obtenerAdministradores({ limit, offset, filtros: req.query })
@@ -58,7 +37,6 @@ export const getAdministradores = async (req, res) => {
 }
 
 export const postAdministrador = async (req, res) => {
-  if (!(await soloSuperAdministrador(req, res))) return
   const client = await dataBase.connect()
   try {
     const { nombre, apellidoPaterno, apellidoMaterno, ci, telefono, email } = req.body
@@ -136,7 +114,6 @@ export const postAdministrador = async (req, res) => {
 }
 
 export const putAdministrador = async (req, res) => {
-  if (!(await soloSuperAdministrador(req, res))) return
   const client = await dataBase.connect()
   try {
     const { id } = req.params
@@ -223,7 +200,6 @@ export const putAdministrador = async (req, res) => {
 
 // Baja lógica: usuarios.estado = 'Inactivo'
 export const deleteAdministrador = async (req, res) => {
-  if (!(await soloSuperAdministrador(req, res))) return
   const client = await dataBase.connect()
   try {
     const { id } = req.params
@@ -260,7 +236,6 @@ export const deleteAdministrador = async (req, res) => {
 
 // Reactivar: usuarios.estado = 'Activo'
 export const activarAdministrador = async (req, res) => {
-  if (!(await soloSuperAdministrador(req, res))) return
   try {
     const { id } = req.params
     const resultado = await cambiarEstadoAdministrador(id, 'Activo')

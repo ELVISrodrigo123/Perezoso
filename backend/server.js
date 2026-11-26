@@ -22,7 +22,6 @@ import chatbotRoutes from './routes/chatbot/chatbot.routes.js'
 import { verificarApiKey } from './middlewares/validacionChatbot/apiKey.middleware.js'
 
 import { verificarToken } from './middlewares/veriificarToken.js'
-import { requireRole } from './middlewares/requireRole.js'
 
 import superAdministradorRoutes from './routes/gestionAdministrador/superAdministrador.js'
 import plazoInscripcionRoutes from './routes/gestionAdministrador/plazoInscripcionRoutes.js'
@@ -45,18 +44,18 @@ app.use('/', preInscripcionRoutes)
 
 app.use('/public', publicRoutes)
 
-app.use('/admin', verificarToken, requireRole('administrador'), superAdministradorRoutes)
+app.use('/admin', verificarToken)
+app.use('/admin', superAdministradorRoutes)
+app.use('/admin', estudiantesRoutes)
+app.use('/admin', cursosRoutes)
+app.use('/admin', profesorRoutes)
+app.use('/admin', inscripcionRoutes)
+app.use('/admin', padresTutorRoutes)
+app.use('/admin', habilitacionEstados)
+app.use('/admin', plazoInscripcionRoutes)
 
-app.use('/admin', verificarToken, requireRole('administrador'), estudiantesRoutes)
-app.use('/admin', verificarToken, requireRole('administrador'), cursosRoutes)
-app.use('/admin', verificarToken, requireRole('administrador'), profesorRoutes)
-app.use('/admin', verificarToken, requireRole('administrador'), inscripcionRoutes)
-app.use('/admin', verificarToken, requireRole('administrador'), padresTutorRoutes)
-app.use('/admin', verificarToken, requireRole('administrador'), habilitacionEstados)
-app.use('/admin', verificarToken, requireRole('administrador'), plazoInscripcionRoutes)
-
-app.use('/docente', verificarToken, requireRole('profesor'), gestionProfesorRoutes)
-app.use('/estudiante', verificarToken, requireRole('estudiante'), gestionEstudianteRoutes)
+app.use('/docente', verificarToken, gestionProfesorRoutes)
+app.use('/estudiante', verificarToken, gestionEstudianteRoutes)
 
 app.use('/api/chatbot', verificarApiKey, chatbotRoutes)
 

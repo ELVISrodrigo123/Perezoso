@@ -11,7 +11,7 @@
  * - Footer with toggle button
  * - Dark color scheme
  * - Fixed positioning
- * - Oculta los ítems marcados con soloSuper si el usuario no es super administrador
+ * - Arma el menú desde los permisos de tipo menú del usuario
  *
  * @component
  * @example
@@ -21,16 +21,33 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react'
+import CIcon from '@coreui/icons-react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { CSidebar, CSidebarFooter, CSidebarHeader, CSidebarToggler } from '@coreui/react'
+import {
+  CNavItem,
+  CNavTitle,
+  CSidebar,
+  CSidebarFooter,
+  CSidebarHeader,
+  CSidebarToggler,
+} from '@coreui/react'
 import { AppSidebarNav } from './AppSidebarNav'
 
 import logo0 from '../assets/images/logo0.svg'
-// sidebar nav config
-import navigation from '../_nav'
-import { verificarEsSuper } from '../services/gestionAdministrador/superAdministrador'
-import { obtenerRol } from '../views/utils/usuario'
+import { getMenuDelUsuario } from '../services/menuService'
+import { SECCION_SIN_TITULO, agruparMenuPorSeccion, iconoDeMenu } from '../views/utils/iconosMenu'
+
+const construirItems = (menu) =>
+  agruparMenuPorSeccion(menu).flatMap(({ seccion, items }) => [
+    ...(seccion === SECCION_SIN_TITULO ? [] : [{ component: CNavTitle, name: seccion }]),
+    ...items.map((item) => ({
+      component: CNavItem,
+      name: item.label,
+      to: item.route,
+      icon: <CIcon icon={iconoDeMenu(item.icon)} customClassName="nav-icon" />,
+    })),
+  ])
 
 /**
  * AppSidebar functional component
@@ -39,7 +56,7 @@ import { obtenerRol } from '../views/utils/usuario'
  * - sidebarShow: Controls sidebar visibility
  * - sidebarUnfoldable: Controls narrow/wide mode
  *
- * Renders navigation from _nav.js configuration file.
+ * Renders navigation from the menu permissions of the user.
  * Memoized to prevent unnecessary re-renders.
  *
  * @returns {React.ReactElement} Sidebar with navigation
@@ -48,30 +65,23 @@ const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
-  const [esSuper, setEsSuper] = useState(false)
+  const [menu, setMenu] = useState([])
 
-  // Solo un administrador necesita saber si además es super administrador
   useEffect(() => {
-    if (obtenerRol() !== 'administrador') return undefined
     let activo = true
-    verificarEsSuper()
-      .then((valor) => {
-        if (activo) setEsSuper(valor === true)
+    getMenuDelUsuario()
+      .then((items) => {
+        if (activo) setMenu(items)
       })
       .catch(() => {
-        if (activo) setEsSuper(false)
+        if (activo) setMenu([])
       })
     return () => {
       activo = false
     }
   }, [])
 
-  // Oculta los ítems marcados con soloSuper si el usuario no es super administrador
-  const items = useMemo(
-    () =>
-      navigation.filter((item) => !item.soloSuper || esSuper).map(({ soloSuper, ...item }) => item),
-    [esSuper],
-  )
+  const items = useMemo(() => construirItems(menu), [menu])
 
   return (
     <CSidebar

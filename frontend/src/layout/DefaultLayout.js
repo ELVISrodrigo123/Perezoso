@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
-import { suscribirCambioRol } from '../services/authSession'
+import { suscribirCambioSesion } from '../services/authSession'
 
 const DefaultLayout = () => {
   const [version, setVersion] = useState(0)
 
-  useEffect(() => suscribirCambioRol(() => setVersion((v) => v + 1)), [])
+  useEffect(() => suscribirCambioSesion(() => setVersion((v) => v + 1)), [])
 
   return (
     <div key={version}>

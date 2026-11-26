@@ -19,7 +19,6 @@ export const getListarCalificacionesEvaluacion = async (req, res) => {
 export const getEvaluacionCurso = async (req, res) => {
   try {
     const idUsuario = req.user.id
-    console.log(`mostrando usuario sin mandar del frontend ${idUsuario}`)
     const { idCurso } = req.params
     const data = await obtenerEvaluacionCurso(idUsuario, idCurso)
     return res.status(200).json({ datos: data.rows })

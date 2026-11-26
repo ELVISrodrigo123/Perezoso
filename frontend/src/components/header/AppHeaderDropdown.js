@@ -8,14 +8,14 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CBadge,
 } from '@coreui/react'
-import { cilLockLocked, cilSettings, cilUser, cilSwapHorizontal } from '@coreui/icons'
+import { cilLockLocked, cilSettings, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 import avatar0 from '../../assets/images/avatars/0.png'
-import { clearAccessToken, setAccessToken, notificarCambioRol } from '../../services/authSession'
-import { postCambiarRol } from '../../services/autorizacionRoutes'
-import { obtenerUsuario } from '../../views/utils/usuario'
+import { clearAccessToken } from '../../services/authSession'
+import { COLORES_ROL, etiquetaDeRol, obtenerUsuario } from '../../views/utils/usuario'
 
 const AppHeaderDropdown = () => {
   const navigate = useNavigate()
@@ -26,23 +26,7 @@ const AppHeaderDropdown = () => {
   }
 
   const usuario = obtenerUsuario()
-  const otrosRoles = (usuario?.roles || []).filter((r) => r !== usuario?.role)
-  const etiquetasRol = {
-    administrador: 'Administrador',
-    profesor: 'Profesor',
-    estudiante: 'Estudiante',
-  }
-
-  const cambiarRol = async (role) => {
-    try {
-      const respuesta = await postCambiarRol(role)
-      setAccessToken(respuesta.data.token)
-      navigate('/dashboard', { replace: true })
-      notificarCambioRol()
-    } catch (error) {
-      console.error('No fue posible cambiar de rol', error)
-    }
-  }
+  const roles = usuario?.roles || []
 
   return (
     <CDropdown variant="nav-item" className="profile-dropdown">
@@ -57,6 +41,18 @@ const AppHeaderDropdown = () => {
         <CDropdownHeader className="profile-dropdown__header fw-semibold mb-2">
           Configuración
         </CDropdownHeader>
+        {usuario?.email && (
+          <div className="px-3 pb-2 small text-body-secondary text-truncate">{usuario.email}</div>
+        )}
+        {roles.length > 0 && (
+          <div className="px-3 pb-2 d-flex flex-wrap gap-1">
+            {roles.map((rol) => (
+              <CBadge key={rol} color={COLORES_ROL[rol] || 'secondary'} shape="rounded-pill">
+                {etiquetaDeRol(rol)}
+              </CBadge>
+            ))}
+          </div>
+        )}
         <CDropdownItem as="button" type="button" disabled className="profile-dropdown__item">
           <CIcon icon={cilUser} className="me-2 profile-dropdown__icon" />
           Perfil
@@ -65,18 +61,6 @@ const AppHeaderDropdown = () => {
           <CIcon icon={cilSettings} className="me-2 profile-dropdown__icon" />
           Ajustes
         </CDropdownItem>
-        {otrosRoles.map((rol) => (
-          <CDropdownItem
-            key={rol}
-            as="button"
-            type="button"
-            onClick={() => cambiarRol(rol)}
-            className="profile-dropdown__item"
-          >
-            <CIcon icon={cilSwapHorizontal} className="me-2 profile-dropdown__icon" />
-            Cambiar a {etiquetasRol[rol] || rol}
-          </CDropdownItem>
-        ))}
         <CDropdownDivider className="profile-dropdown__divider" />
         <CDropdownItem
           as="button"

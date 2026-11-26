@@ -1,6 +1,26 @@
 import { jwtDecode } from 'jwt-decode'
 import { getAccessToken, clearAccessToken } from '../../services/authSession'
 
+export const ETIQUETAS_ROL = {
+  super_administrador: 'Super administrador',
+  administrador: 'Administrador',
+  profesor: 'Profesor',
+  estudiante: 'Estudiante',
+}
+
+export const COLORES_ROL = {
+  super_administrador: 'warning',
+  administrador: 'primary',
+  profesor: 'success',
+  estudiante: 'info',
+}
+
+export const etiquetaDeRol = (codigo) =>
+  ETIQUETAS_ROL[codigo] ||
+  String(codigo)
+    .replace(/_/g, ' ')
+    .replace(/^\w/, (letra) => letra.toLocaleUpperCase())
+
 export const obtenerUsuario = () => {
   const token = getAccessToken()
   if (!token) {
@@ -14,18 +34,13 @@ export const obtenerUsuario = () => {
   }
 }
 
-export const obtenerRol = () => obtenerUsuario()?.role || null
+export const obtenerRoles = () => obtenerUsuario()?.roles || []
 
-export const obtenerPermisos = () => obtenerUsuario()?.permisos || []
+export const obtenerPermisos = () => obtenerUsuario()?.permissions || []
 
 export const hasPermission = (permiso) => obtenerPermisos().includes(permiso)
 
-export const obtenerRutaPrincipal = () => {
-  const rutasPorRol = {
-    administrador: '/dashboard',
-    profesor: '/dashboard',
-    estudiante: '/dashboard',
-  }
-
-  return rutasPorRol[obtenerRol()] || null
+export const hasAnyPermission = (...permisos) => {
+  const propios = obtenerPermisos()
+  return permisos.some((permiso) => propios.includes(permiso))
 }

@@ -9,9 +9,6 @@ import { avisarPagoAN8n } from '../services/n8nWebhook.js'
 
 export const getMostrarRecibos = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const { page, limit, offset } = obtenerPaginacion(req.query)
     const { vista } = req.query
 
@@ -38,9 +35,6 @@ export const getMostrarRecibos = async (req, res) => {
 
 export const postRegistrarRecibos = async (req, res) => {
   try {
-    if (!req.user || req.user.role !== 'administrador') {
-      return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden acceder a esta información.' })
-    }
     const informe = await registrarRecibos(req.body)
     if (informe.rowCount === 0) {
       return res.status(400).json({ message: 'No se pudo registrar el recibo' })

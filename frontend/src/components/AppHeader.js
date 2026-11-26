@@ -41,7 +41,29 @@ import { cilContrast, cilDescription, cilMenu, cilMoon, cilSun } from '@coreui/i
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { getPreinscripcionEstudiante } from '../services/preInscripcionEstudianteRoutes'
-import { obtenerRol } from '../views/utils/usuario'
+import { hasPermission } from '../views/utils/usuario'
+
+const ACCESOS_RAPIDOS = [
+  { permiso: 'menu.students.view', ruta: '/admin/estudiantes', texto: 'Estudiantes' },
+  { permiso: 'menu.courses.view', ruta: '/admin/cursos', texto: 'Cursos' },
+  { permiso: 'menu.teachers.view', ruta: '/admin/profesores', texto: 'Profesores' },
+  { permiso: 'menu.teaching.courses.view', ruta: '/docente/cursos', texto: 'Mis cursos' },
+  {
+    permiso: 'menu.teaching.students.view',
+    ruta: '/docente/estudiantes',
+    texto: 'Mis estudiantes',
+  },
+  {
+    permiso: 'menu.learning.enroll.view',
+    ruta: '/estudiante/preinscripciones',
+    texto: 'Inscribirme a cursos',
+  },
+  {
+    permiso: 'menu.learning.courses.view',
+    ruta: '/estudiante/cursos',
+    texto: 'Mis cursos y resultados',
+  },
+]
 
 /**
  * AppHeader functional component
@@ -62,7 +84,8 @@ const AppHeader = () => {
 
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
-  const rol = obtenerRol()
+  const verPreinscripciones = hasPermission('menu.preregistrations.view')
+  const accesosRapidos = ACCESOS_RAPIDOS.filter((item) => hasPermission(item.permiso)).slice(0, 4)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,7 +98,7 @@ const AppHeader = () => {
   }, [])
 
   useEffect(() => {
-    if (rol !== 'administrador') {
+    if (!verPreinscripciones) {
       return undefined
     }
 
@@ -96,7 +119,7 @@ const AppHeader = () => {
     return () => {
       componenteActivo = false
     }
-  }, [rol])
+  }, [verPreinscripciones])
 
   return (
     <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
@@ -108,55 +131,19 @@ const AppHeader = () => {
         >
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
-        {rol === 'estudiante' && (
+        {accesosRapidos.length > 0 && (
           <CHeaderNav className="d-none d-md-flex header-nav">
-            <CNavItem>
-              <CNavLink to="/estudiante/preinscripciones" as={NavLink} className="header-link">
-                Inscribirme a cursos
-              </CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink to="/estudiante/cursos" as={NavLink} className="header-link">
-                Mis cursos y resultados
-              </CNavLink>
-            </CNavItem>
-          </CHeaderNav>
-        )}
-        {rol === 'profesor' && (
-          <CHeaderNav className="d-none d-md-flex header-nav">
-            <CNavItem>
-              <CNavLink to="/docente/cursos" as={NavLink} className="header-link">
-                Mis Cursos
-              </CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink to="/docente/estudiantes" as={NavLink} className="header-link">
-                Mis Estudiantes
-              </CNavLink>
-            </CNavItem>
-          </CHeaderNav>
-        )}
-        {rol === 'administrador' && (
-          <CHeaderNav className="d-none d-md-flex header-nav">
-            <CNavItem>
-              <CNavLink to="/admin/estudiantes" as={NavLink} className="header-link">
-                Estudiantes
-              </CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink to="/admin/cursos" as={NavLink} className="header-link">
-                Cursos
-              </CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink to="/admin/profesores" as={NavLink} className="header-link">
-                Profesores
-              </CNavLink>
-            </CNavItem>
+            {accesosRapidos.map((item) => (
+              <CNavItem key={item.ruta}>
+                <CNavLink to={item.ruta} as={NavLink} className="header-link">
+                  {item.texto}
+                </CNavLink>
+              </CNavItem>
+            ))}
           </CHeaderNav>
         )}
         <CHeaderNav className="ms-auto align-items-center">
-          {rol === 'administrador' && (
+          {verPreinscripciones && (
             <CNavItem>
               <CNavLink
                 as="button"
