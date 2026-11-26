@@ -572,8 +572,9 @@ const EstudianteTable = ({
                         <CButtonGroup size="sm">
                           {est.estado !== 'Activo' ? (
                             <CButton
-                              color="info"
+                              color="secondary"
                               variant="outline"
+                              disabled
                               className="estudiante-table__action"
                             >
                               Bloqueado
@@ -599,15 +600,15 @@ const EstudianteTable = ({
                           </CButton>
                           {est.estado !== 'Activo' ? (
                             <CButton
-                              color="danger"
+                              color="success"
                               variant="outline"
-                              onClick={() => {
-                                ejecutarHabilitarUsuario(est.id_cuenta, 'estudiante')
-                                cargarEstudiantes()
+                              onClick={async () => {
+                                await ejecutarHabilitarUsuario(est.id_cuenta, 'estudiante')
+                                await cargarEstudiantes()
                               }}
                               className="estudiante-table__action"
                             >
-                              Habilitar
+                              Activar
                             </CButton>
                           ) : (
                             <CButton
@@ -616,7 +617,7 @@ const EstudianteTable = ({
                               onClick={() => eliminarEstudiante(est.id_estudiante)}
                               className="estudiante-table__action"
                             >
-                              Eliminar
+                              Dar de baja
                             </CButton>
                           )}
                         </CButtonGroup>

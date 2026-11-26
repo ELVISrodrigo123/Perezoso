@@ -201,19 +201,19 @@ const ProfesorTable = ({
                             onClick={() => eliminarProfesor(profe.id_profesor)}
                             className="profesor-table__action"
                           >
-                            Eliminar
+                            Dar de baja
                           </CButton>
                         ) : (
                           <CButton
-                            color="danger"
+                            color="success"
                             variant="outline"
                             onClick={async () => {
-                              ejecutarHabilitarUsuario(profe.id_cuenta, 'profesor')
+                              await ejecutarHabilitarUsuario(profe.id_cuenta, 'profesor')
                               await cargarProfesor()
                             }}
                             className="profesor-table__action"
                           >
-                            Habilitar
+                            Activar
                           </CButton>
                         )}
                       </CButtonGroup>
