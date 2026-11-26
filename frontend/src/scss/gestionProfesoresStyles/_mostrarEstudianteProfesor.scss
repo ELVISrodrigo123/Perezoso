@@ -1,0 +1,487 @@
+.estudiantes-profesor__container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.estudiantes-profesor__header {
+  padding: 0.5rem 0;
+}
+
+.estudiantes-profesor__title {
+  margin: 0;
+  font-size: clamp(1.55rem, 2vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+
+.estudiantes-profesor__report {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  box-shadow: var(--shadow-sm);
+}
+
+.estudiantes-profesor__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.estudiantes-profesor__stat {
+  flex: 1 1 220px;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.estudiantes-profesor__stat--total {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.estudiantes-profesor__stat strong {
+  font-size: 1.8rem;
+  color: var(--brand-primary);
+  line-height: 1;
+}
+
+.estudiantes-profesor__label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.estudiantes-profesor__list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-primary);
+  display: grid;
+  gap: 0.35rem;
+}
+
+.estudiantes-profesor__empty {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.table-estudiantes-profesor__wrapper {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.table-estudiantes-profesor__table {
+  width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+
+.table-estudiantes-profesor__head {
+  padding: 0.9rem 1rem;
+  background: rgba(37, 99, 235, 0.05);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.table-estudiantes-profesor__row {
+  transition: background-color 0.2s ease;
+}
+
+.table-estudiantes-profesor__row:hover {
+  background: rgba(37, 99, 235, 0.02);
+}
+
+.table-estudiantes-profesor__cell {
+  padding: 1rem;
+  background-color: transparent !important;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+  vertical-align: middle;
+  line-height: 1.6;
+}
+
+.table-estudiantes-profesor__group-row {
+  background: rgba(37, 99, 235, 0.02);
+}
+
+.table-estudiantes-profesor__group-cell {
+  padding: 0.85rem 1rem;
+  text-align: center;
+  background-color: transparent !important;
+  border-bottom: 1px solid rgba(147, 197, 253, 0.28);
+  color: var(--text-primary);
+}
+
+html[data-coreui-theme='dark'] .estudiantes-profesor__report {
+  background: linear-gradient(180deg, #111827 0%, #1d1e2b 100%);
+  border-color: rgba(148, 163, 184, 0.15);
+  box-shadow: 0 10px 25px rgba(2, 6, 23, 0.28);
+}
+
+html[data-coreui-theme='dark'] .estudiantes-profesor__title,
+html[data-coreui-theme='dark'] .estudiantes-profesor__list,
+html[data-coreui-theme='dark'] .estudiantes-profesor__helper,
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__head,
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__cell,
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__group-cell {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+html[data-coreui-theme='dark'] .estudiantes-profesor__stat {
+  background: rgba(15, 23, 42, 0.78);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__wrapper {
+  background: #1d1e2b;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 25px rgba(2, 6, 23, 0.28);
+}
+
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__head {
+  background: #14151f;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__cell,
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__group-cell {
+  background-color: transparent !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-coreui-theme='dark'] .table-estudiantes-profesor__group-row {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+@media (max-width: 767.98px) {
+  .estudiantes-profesor__report {
+    padding: 0.9rem;
+  }
+
+  .table-estudiantes-profesor__head {
+    padding: 0.75rem 0.7rem;
+    font-size: 0.68rem;
+  }
+
+  .table-estudiantes-profesor__cell,
+  .table-estudiantes-profesor__group-cell {
+    padding: 0.8rem 0.7rem;
+    font-size: 0.8rem;
+  }
+}
+
+.estudiantes-profesor__acordeon {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.estudiantes-profesor__curso {
+  overflow: hidden;
+  border: 1px solid var(--cui-border-color);
+  border-radius: var(--radius-md);
+  background: var(--cui-body-bg);
+}
+
+.estudiantes-profesor__curso-toggle {
+  width: 100%;
+  min-height: 3.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--cui-tertiary-bg);
+  color: var(--cui-body-color);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.estudiantes-profesor__curso-toggle:hover {
+  background: var(--cui-secondary-bg);
+}
+
+.estudiantes-profesor__curso-toggle:focus-visible {
+  outline: 2px solid var(--cui-primary);
+  outline-offset: 2px;
+}
+
+.estudiantes-profesor__curso-nombre {
+  min-width: 0;
+  flex: 1;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.estudiantes-profesor__curso-cantidad {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--cui-border-color);
+  border-radius: var(--radius-pill);
+  color: var(--cui-secondary-color);
+  background: var(--cui-body-bg);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.estudiantes-profesor__curso-flecha {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-right: 2px solid var(--cui-secondary-color);
+  border-bottom: 2px solid var(--cui-secondary-color);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.estudiantes-profesor__curso-flecha.is-open {
+  transform: rotate(45deg);
+}
+
+.estudiantes-profesor__curso-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.estudiantes-profesor__curso-panel.is-open {
+  max-height: 60rem;
+  overflow: visible;
+  opacity: 1;
+  border-top: 1px solid var(--cui-border-color);
+  padding: 0.75rem;
+}
+
+.estudiantes-profesor__curso-panel.is-open > .estudiantes-profesor__empty {
+  padding: 1rem;
+  text-align: center;
+}
+
+.estudiantes-profesor__curso-panel .table-estudiantes-profesor__wrapper {
+  overflow-x: auto;
+}
+
+.estudiantes-profesor__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.25rem 0.25rem;
+}
+
+.estudiantes-profesor__paginacion-info {
+  color: var(--cui-secondary-color);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.estudiantes-profesor__paginacion-lista {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.estudiantes-profesor__paginacion-boton {
+  min-width: 2.1rem;
+  min-height: 2.1rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--cui-border-color);
+  border-radius: 0.45rem;
+  background: var(--cui-body-bg);
+  color: var(--cui-body-color);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.estudiantes-profesor__paginacion-boton:hover:not(:disabled) {
+  border-color: var(--cui-primary);
+  background: var(--cui-tertiary-bg);
+}
+
+.estudiantes-profesor__paginacion-boton:focus-visible {
+  outline: 2px solid var(--cui-primary);
+  outline-offset: 2px;
+}
+
+.estudiantes-profesor__paginacion-boton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.estudiantes-profesor__paginacion-boton--activo {
+  border-color: var(--cui-primary);
+  background: var(--cui-primary);
+  color: var(--cui-white);
+}
+
+.estudiantes-profesor__paginacion-ellipsis {
+  min-width: 1.5rem;
+  text-align: center;
+  color: var(--cui-secondary-color);
+}
+
+@media (max-width: 767.98px) {
+  .estudiantes-profesor__curso-toggle {
+    flex-wrap: wrap;
+  }
+
+  .estudiantes-profesor__curso-nombre {
+    flex-basis: calc(100% - 2rem);
+  }
+
+  .estudiantes-profesor__paginacion {
+    flex-direction: column;
+  }
+
+  .estudiantes-profesor__paginacion-info {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.estudiantes-profesor__busqueda {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0 0.75rem;
+}
+
+.estudiantes-profesor__busqueda .form-control {
+  max-width: 20rem;
+}
+
+.table-estudiantes-profesor__wrapper.is-cargando {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+@media (max-width: 767.98px) {
+  .estudiantes-profesor__busqueda {
+    justify-content: stretch;
+  }
+
+  .estudiantes-profesor__busqueda .form-control {
+    max-width: 100%;
+  }
+}
+
+/* ===== DARK MODE: acordeón, píldoras, buscador y paginación ===== */
+
+html[data-coreui-theme='dark'] {
+  .estudiantes-profesor__curso {
+    background: #1d1e2b;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .estudiantes-profesor__curso-toggle {
+    background: #232536;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .estudiantes-profesor__curso-toggle:hover {
+    background: #2b2e42;
+  }
+
+  .estudiantes-profesor__curso-nombre {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .estudiantes-profesor__curso-cantidad {
+    background: #14151f;
+    border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .estudiantes-profesor__curso-flecha {
+    border-right-color: rgba(255, 255, 255, 0.7);
+    border-bottom-color: rgba(255, 255, 255, 0.7);
+  }
+
+  .estudiantes-profesor__curso-panel.is-open {
+    background: #1d1e2b;
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .estudiantes-profesor__label,
+  .estudiantes-profesor__empty,
+  .estudiantes-profesor__paginacion-info,
+  .estudiantes-profesor__paginacion-ellipsis {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* buscador */
+  .estudiantes-profesor__busqueda .form-control {
+    background-color: #14151f;
+    border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .estudiantes-profesor__busqueda .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .estudiantes-profesor__busqueda .form-control:focus {
+    background-color: #14151f;
+    border-color: var(--cui-primary, #321fdb);
+    color: #fff;
+  }
+
+  /* paginación */
+  .estudiantes-profesor__paginacion-boton {
+    background: #14151f;
+    border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .estudiantes-profesor__paginacion-boton:hover:not(:disabled) {
+    background: #2b2e42;
+  }
+
+  .estudiantes-profesor__paginacion-boton--activo {
+    background: var(--cui-primary, #321fdb);
+    border-color: var(--cui-primary, #321fdb);
+    color: #fff;
+  }
+}

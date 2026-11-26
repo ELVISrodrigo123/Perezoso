@@ -1,0 +1,5 @@
+@use "@coreui/coreui/scss/variables" as * with (
+  $enable-deprecation-messages: false
+);
+@use "@coreui/coreui/scss/mixins/breakpoints" as *;
+@use "@coreui/coreui/scss/mixins/color-mode" as *;

@@ -1,0 +1,785 @@
+### ELIMINANDO POR ID ESTUDIANTE
+DELETE http://localhost:5000/inscripciones/43
+
+### ELIMINANDO POR ID ESTUDIANTE
+DELETE http://localhost:5000/inscripciones/estudiante/27
+
+
+### CREAR INSCRIPCION
+POST http://localhost:5000/inscripciones
+Content-Type: application/json
+
+{
+  "idEstudiante": "",
+  "idCurso": "  "
+}
+
+### MOSTRANDO INSCRIPCIONES 
+GET  http://localhost:5000/inscripciones/profesor/1
+
+### MOSTRANDO INSCRIPCIONES 
+
+GET  http://localhost:5000/inscripciones
+
+### MOSTRANDO INSCRIPCIONES POR CURSO
+GET  http://localhost:5000/inscripciones/curso/23
+
+### APLICANDO ELIMINACION DE UN PROFESOR
+DELETE  http://localhost:5000/profesor/14
+
+
+###ACTUALIZAR PROFESOR
+PUT http://localhost:5000/profesor/13
+Content-Type: application/json
+
+{
+  "nombre": "uil",
+  "apellidoPaterno": "perez",
+  "apellidoMaterno": "",
+  "ci": "1010&",
+  "telefono": "67677676-t",
+  "email": "algoo@",
+  "especialidad": "topografo"
+}
+
+### CREAR PROFESOR
+POST http://localhost:5000/profesor
+Content-Type: application/json
+
+{
+  "nombre": "sera",
+  "apellidoPaterno": "perez",
+  "apellidoMaterno": "",
+  "ci": "1010",
+  "telefono": "67677676",
+  "email": "algoo@gmail.com",
+  "especialidad": "topografo"
+}
+
+### APLICANDO ELIMINACION DE UN CURSO
+DELETE  http://localhost:5000/cursos/6
+
+### APLICANDO postCURSOS 
+PUT   http://localhost:5000/cursos/10
+Content-Type: application/json
+
+{
+  
+  "nombre": "",
+  "descripcion": "calculosss",
+  "duracion": "20",
+  "unidad": "days",
+  "precio": "200",
+  "cupos": "15"
+
+}
+
+### APLICANDO postCURSOS 
+POST  http://localhost:5000/cursos
+Content-Type: application/json
+
+{
+  
+  "nombre": "matematicas",
+  "descripcion": "calculos sin problemas",
+  "duracion": "20",
+  "unidad": "das",
+  "precio": "200",
+  "cupos": "15"
+
+}
+
+
+### APLICANDO GET CURSOS
+GET http://localhost:5000/cursos
+
+
+### APLICANDO ELIMINACION DE UN ESTUDIANTE
+DELETE  http://localhost:5000/estudiantes/23
+
+### APLICANDO ACTUALIZACION DE UN ESTUDIANTE
+PUT http://localhost:5000/admin/estudiantes/26
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzg5MDYxNzg5LCJleHAiOjE3ODkwNjUzODl9.a3Inm4OugSn9EaAJKSQCp75ZtHavfWBzrQKo0KmNuPs
+
+{
+  
+  "nombre": "nosenose",
+  "apellidoPaterno": "Perez",
+  "apellidoMaterno": "Gomez",
+  "ci": "777799",
+  "direccion": "La Paz",
+  "telefono": "99999",
+  "email": "nosenose@gmail.com",
+  "colegio": "colegio de la litoral"
+
+}
+
+
+### APLICANDO GET ESTUDIANTES
+GET http://localhost:5000/estudiantes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzc4MTczMzE0LCJleHAiOjE3NzgxNzY5MTR9.OkuKhtWaGGhMNRDdT6qaOShWm5hZ9O0ftQEx1garq58
+
+
+### APLICANDO web
+GET http://localhost:5000
+
+### APLICANDO REGISTRO
+POST http://localhost:5000/admin/estudiantes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzg5MDYxNzg5LCJleHAiOjE3ODkwNjUzODl9.a3Inm4OugSn9EaAJKSQCp75ZtHavfWBzrQKo0KmNuPs
+
+{
+  
+  "nombre": "prueba 2",
+  "apellidoPaterno": "prueba 2",
+  "apellidoMaterno": "prueba 2",
+  "ci": "7980787",
+  "direccion": "La Paz",
+  "telefono": "99999",
+  "email": "prueba2@gmail.com",
+  "colegio": "colegio de la paz"
+
+
+}
+
+### APLICANDO LOGIN
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "loayza@gmail.com",
+    "password": "9898989"
+}
+
+### APLICANDO VERIFICACION CON TOKEN
+GET http://localhost:5000/perfil
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzgzNTI3MzA5LCJleHAiOjE3ODM1MzA5MDl9.o3TNLCHHqIqKOMleKWU7ZVC9rHmInqaqK16G2yg6L3A
+### MOSTRANDO INSCRIPCIONES POR CURSO
+GET  http://localhost:5000/admin/inscripciones/estudiante/26
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzgzNTMzMzIzLCJleHAiOjE3ODM1MzY5MjN9.dXRZ5HaXU_g3MncWIzdlDlwoIMfnM1etKTj-6v2gGeY
+
+
+### MOSTRANDO INSCRIPCIONES POR CURSO
+DELETE  http://localhost:5000/inscripciones/0/estudiante
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzgzODY1MzIwLCJleHAiOjE3ODM4Njg5MjB9.nAdH5CIg_FsMpf-QX_LVp-nQ0bkI1TWh7Ii4VwRO5Q0
+
+
+### CREAR INSCRIPCION
+POST http://localhost:5000/inscripciones
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzgzODY1MzIwLCJleHAiOjE3ODM4Njg5MjB9.nAdH5CIg_FsMpf-QX_LVp-nQ0bkI1TWh7Ii4VwRO5Q0
+
+{
+  "idEstudiante": ,
+  "idCurso": 
+}
+
+### APLICANDO REGISTRO
+POST http://localhost:5000/preinscripcion/estudiante
+Content-Type: application/json
+
+{
+  
+  "nombre": "luisifon",
+  "apellidoPaterno": "Perez",
+  "apellidoMaterno": "Gomez",
+  "ci": "787878967",
+  "direccion": "La Paz",
+  "telefono": "9823599",
+  "email": "lupsifon@gmail.com",
+  "colegio": "colegio de la paz"
+
+}
+
+
+### 
+GET  http://localhost:5000/preinscripcion/lista
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzg1ODEwNjY0LCJleHAiOjE3ODU4MTQyNjR9.KWgKSe_-UHTjcoKvwaxKw0ZnmtMbzZas5TpCQlk5D4Q
+
+### PREINSCRIPCION RECHAZADO
+POST http://localhost:5000/preinscripcion/rechazado/27
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzg1Nzk3NzgxLCJleHAiOjE3ODU4MDEzODF9.bXmm3hgTwzGwa6I00w39LGghw-n1lQNm_1hWCfmfJGk
+
+### PREINSCRIPCION ACEPTADA
+POST http://localhost:5000/preinscripcion/aceptada/0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzg2MjAwNDQ2LCJleHAiOjE3ODYyMDQwNDZ9.Vi7niBmhaGPTOphsHUiVamn1a4J3zbHyRpN7TulLsZg
+
+
+### APLICANDO LOGIN PROFESOR
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "loayza@gmail.com",
+    "password": "9898989"
+}
+
+
+### APLICANDO mostrar cursos para PROFESOR
+GET  http://localhost:5000/docente/cursos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzQxMDczNywiZXhwIjoxNzg3NDE0MzM3fQ.CN8Lk9sKtAjgJASrU7A8fqp74-wkQ0vol4JEiv_pWRQ
+
+### APLICANDO mostrar estudiantes para PROFESOR
+GET  http://localhost:5000/docente/estudiantes/51
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzM1MDUwMSwiZXhwIjoxNzg3MzU0MTAxfQ.8cHJBRLb1jWSsAU5g2PveJwb4NGIzJrWF4sg1j5GzLk
+
+
+### APLICANDO mostrar cursos para evalacion
+GET  http://localhost:5000/docente/cursos/evaluacion/51
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzM1MDUwMSwiZXhwIjoxNzg3MzU0MTAxfQ.8cHJBRLb1jWSsAU5g2PveJwb4NGIzJrWF4sg1j5GzLk
+
+### APLICANDO mostrar evaluacion de cada curso
+GET  http://localhost:5000/docente/cursos/evaluacion/examen/51/19
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzM2MTM4OCwiZXhwIjoxNzg3MzY0OTg4fQ.IslsSbUeO12aFrV1BNzRQ8W2gzgH1TMSXkUMyzBevDc
+
+### APLICANDO listar calificaciones para PROFESOR
+GET  http://localhost:5000/docente/cursos/evaluacion/examen/listarCalificaciones/22/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzQxMDczNywiZXhwIjoxNzg3NDE0MzM3fQ.CN8Lk9sKtAjgJASrU7A8fqp74-wkQ0vol4JEiv_pWRQ
+
+### APLICANDO insertar calificacion
+POST http://localhost:5000/docente/cursos/evaluacion/examen/listarCalificaciones/calificarExamen
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzYxNzg0MiwiZXhwIjoxNzg3NjIxNDQyfQ.YjAvWH1zDe7rsuiU17jAiHuUqWP7AN6sIgcVknBjSX8
+
+{
+    "idEvaluacion": "2",
+    "idInscripcion": "90",
+    "nota": "67.00",
+    "observacion": "Esto es de prueba",
+    "idEstudiante": "27"
+}
+
+### APLICANDO Editar calificacion
+PUT http://localhost:5000/docente/cursos/evaluacion/examen/listarCalificaciones/editarExamen
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzYxNzg0MiwiZXhwIjoxNzg3NjIxNDQyfQ.YjAvWH1zDe7rsuiU17jAiHuUqWP7AN6sIgcVknBjSX8
+
+{
+    "idEvaluacion": "2",
+    "idInscripcion": "90",
+    "idCalificacion": "23",
+    "nota": "77",
+    "observacion": "Esto es de 2da prueba con actualizaion",
+    "idEstudiante": "27"
+}
+
+/cursos/evaluacion/examen/crearEvaluacion
+
+### APLICANDO Editar calificacion
+POST  http://localhost:5000/docente/cursos/evaluacion/examen/crearEvaluacion
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzcxNTAyNCwiZXhwIjoxNzg3NzE4NjI0fQ.q46taIiz3i4ts6WTcvtxq5L9WXqr6QEnxLmEuwiytLY
+
+{
+    "idCurso": "19",
+    "nombreEvaluacion": "Examen final",
+    "descripcion": "Este examen incluye todos los temas",
+    "fechaEvaluacion": "2026-09-24",
+    "porcentaje": "50"
+}
+
+### APLICANDO Editar evaluacion
+PUT   http://localhost:5000/docente/cursos/evaluacion/examen/editarEvaluacion
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc4NzcyODgzMiwiZXhwIjoxNzg3NzMyNDMyfQ.hUqBPSq9QycGqi_2Yv1NpunbxO-oc8FoakWF4btbhmY
+
+{
+    "idEvaluacion": "2",
+    "idCurso": "19",
+    "nombreEvaluacion": "Examen final prueba",
+    "descripcion": "Este examen incluye todos los temas",
+    "fechaEvaluacion": "2026-09-24",
+    "porcentaje": "50"
+}
+/cursos/evaluacion/examen/eliminarEvaluacion/:idEvaluacion
+
+### APLICANDO eliminar evaluacion
+DELETE   http://localhost:5000/docente/cursos/evaluacion/examen/eliminarEvaluacion/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJzZXJhZmlub0BnbWFpbC5jb20iLCJyb2xlIjoiZXN0dWRpYW50ZSIsImlhdCI6MTc4Nzg1NTgxMSwiZXhwIjoxNzg3ODU5NDExfQ.f_Fncp00FE3-JhNwltWlbtcFlT4dn8LQH6itJxiqjKw
+
+
+###login para estudiante
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "serafino@gmail.com",
+    "password": "777777"
+}
+
+### aplicando mostrar curso par estudiantes
+GET http://localhost:5000/estudiante/curso
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJzZXJhZmlub0BnbWFpbC5jb20iLCJyb2xlIjoiZXN0dWRpYW50ZSIsImlhdCI6MTc4Nzg1OTkxMCwiZXhwIjoxNzg3ODYzNTEwfQ.IG7s4C2SykyallepY23CyQL4u7wOxZp4_gtGH0QO4kU
+
+### aplicando mostrar calificacion del estudiantes
+GET http://localhost:5000/estudiante/curso/calificaciones/19
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJzZXJhZmlub0BnbWFpbC5jb20iLCJyb2xlIjoiZXN0dWRpYW50ZSIsImlhdCI6MTc4Nzg2Nzk5NCwiZXhwIjoxNzg3ODcxNTk0fQ.CicZGrW2hcsKwPzzKCUKWzXhb4P195QBI6DWEbMsEeY
+
+
+
+
+
+
+
+### ==========================================================
+### GET - MOSTRAR ADMINISTRADORES
+### ==========================================================
+
+### Mostrar administradores (super admin) -> 200
+GET {{baseUrl}}/admin/administradores
+Authorization: Bearer {{tokenSuper}}
+
+### Mostrar administradores (admin normal) -> 403
+GET {{baseUrl}}/admin/administradores
+Authorization: Bearer {{tokenNormal}}
+
+### Mostrar administradores (sin token) -> 401
+GET {{baseUrl}}/admin/administradores
+
+### ==========================================================
+### POST - CREAR ADMINISTRADOR
+### ==========================================================
+
+### Crear administrador correcto -> 201
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Carlos",
+  "apellidoPaterno": "Quispe",
+  "apellidoMaterno": "Mamani",
+  "ci": "9876543",
+  "telefono": "78945612",
+  "email": "carlos.quispe@gmail.com"
+}
+
+### Crear sin apellido materno ni teléfono (opcionales) -> 201
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Maria",
+  "apellidoPaterno": "Flores",
+  "ci": "5554321",
+  "email": "maria.flores@gmail.com"
+}
+
+### Crear sin nombre -> 400 (validator)
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "",
+  "apellidoPaterno": "Quispe",
+  "ci": "1112223",
+  "email": "sinnombre@gmail.com"
+}
+
+### Crear con email inválido -> 400 (validator)
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Pedro",
+  "apellidoPaterno": "Rojas",
+  "ci": "1112224",
+  "email": "correo-invalido"
+}
+
+### Crear sin email -> 400 (validator)
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Pedro",
+  "apellidoPaterno": "Rojas",
+  "ci": "1112225"
+}
+
+### Crear con teléfono no numérico -> 400 (validator)
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Pedro",
+  "apellidoPaterno": "Rojas",
+  "ci": "1112226",
+  "telefono": "abc123",
+  "email": "pedro.rojas@gmail.com"
+}
+
+### Crear con CI duplicado -> 400 ci_duplicado (usa un CI ya registrado)
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Otro",
+  "apellidoPaterno": "Usuario",
+  "ci": "9876543",
+  "email": "otro.usuario@gmail.com"
+}
+
+### Crear con email duplicado -> 400 usuario_duplicado (usa un correo ya registrado)
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Otro",
+  "apellidoPaterno": "Usuario",
+  "ci": "3334445",
+  "email": "carlos.quispe@gmail.com"
+}
+
+### Crear (admin normal) -> 403
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+Authorization: Bearer {{tokenNormal}}
+
+{
+  "nombre": "Intruso",
+  "apellidoPaterno": "Prueba",
+  "ci": "7778889",
+  "email": "intruso@gmail.com"
+}
+
+### Crear (sin token) -> 401
+POST {{baseUrl}}/admin/administradores
+Content-Type: application/json
+
+{
+  "nombre": "Intruso",
+  "apellidoPaterno": "Prueba",
+  "ci": "7778889",
+  "email": "intruso@gmail.com"
+}
+
+### ==========================================================
+### PUT - ACTUALIZAR ADMINISTRADOR
+### (cambia el 2 por el id_administrador que quieras probar)
+### ==========================================================
+
+### Actualizar correcto -> 200
+PUT {{baseUrl}}/admin/administradores/2
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Carlos Alberto",
+  "apellidoPaterno": "Quispe",
+  "apellidoMaterno": "Mamani",
+  "ci": "9876543",
+  "telefono": "78945612",
+  "email": "carlos.quispe@gmail.com"
+}
+
+### Actualizar cambiando email y CI (también actualiza usuario y contraseña) -> 200
+PUT {{baseUrl}}/admin/administradores/2
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Carlos Alberto",
+  "apellidoPaterno": "Quispe",
+  "apellidoMaterno": "Mamani",
+  "ci": "9876544",
+  "telefono": "78945612",
+  "email": "carlos.nuevo@gmail.com"
+}
+
+### Actualizar sin nombre -> 400 (validator)
+PUT {{baseUrl}}/admin/administradores/2
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "",
+  "apellidoPaterno": "Quispe",
+  "ci": "9876543",
+  "email": "carlos.quispe@gmail.com"
+}
+
+### Actualizar con CI de otro administrador -> 400 ci_duplicado
+PUT {{baseUrl}}/admin/administradores/2
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Carlos",
+  "apellidoPaterno": "Quispe",
+  "ci": "5554321",
+  "email": "carlos.quispe@gmail.com"
+}
+
+### Actualizar con email de otro administrador -> 400 duplicado
+PUT {{baseUrl}}/admin/administradores/2
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Carlos",
+  "apellidoPaterno": "Quispe",
+  "ci": "9876543",
+  "email": "maria.flores@gmail.com"
+}
+
+### Actualizar administrador inexistente -> 404
+PUT {{baseUrl}}/admin/administradores/99999
+Content-Type: application/json
+Authorization: Bearer {{tokenSuper}}
+
+{
+  "nombre": "Fantasma",
+  "apellidoPaterno": "Inexistente",
+  "ci": "0000001",
+  "email": "fantasma@gmail.com"
+}
+
+### Actualizar (admin normal) -> 403
+PUT {{baseUrl}}/admin/administradores/2
+Content-Type: application/json
+Authorization: Bearer {{tokenNormal}}
+
+{
+  "nombre": "Carlos",
+  "apellidoPaterno": "Quispe",
+  "ci": "9876543",
+  "email": "carlos.quispe@gmail.com"
+}
+
+### ==========================================================
+### DELETE - DAR DE BAJA (baja lógica: estado = 'Inactivo')
+### ==========================================================
+
+### Dar de baja administrador -> 200
+DELETE {{baseUrl}}/admin/administradores/2
+Authorization: Bearer {{tokenSuper}}
+
+### Dar de baja al super administrador (id 1) -> 403
+DELETE {{baseUrl}}/admin/administradores/1
+Authorization: Bearer {{tokenSuper}}
+
+### Dar de baja administrador inexistente -> 404
+DELETE {{baseUrl}}/admin/administradores/99999
+Authorization: Bearer {{tokenSuper}}
+
+### Dar de baja (admin normal) -> 403
+DELETE {{baseUrl}}/admin/administradores/2
+Authorization: Bearer {{tokenNormal}}
+
+### Dar de baja (sin token) -> 401
+DELETE {{baseUrl}}/admin/administradores/2
+
+### ==========================================================
+### PUT - ACTIVAR ADMINISTRADOR (estado = 'Activo')
+### ==========================================================
+
+### Activar administrador -> 200
+PUT {{baseUrl}}/admin/administradores/2/activar
+Authorization: Bearer {{tokenSuper}}
+
+### Activar administrador inexistente -> 404
+PUT {{baseUrl}}/admin/administradores/99999/activar
+Authorization: Bearer {{tokenSuper}}
+
+### Activar (admin normal) -> 403
+PUT {{baseUrl}}/admin/administradores/2/activar
+Authorization: Bearer {{tokenNormal}}
+
+### Activar (sin token) -> 401
+PUT {{baseUrl}}/admin/administradores/2/activar
+
+###
+GET http://localhost:5000/admin/administradores?page=1&limit=10
+Authorization: Bearer {{{{tokenSuper}}}}
+###
+GET http://localhost:5000/admin/inscripciones?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+###
+GET http://localhost:5000/inscripciones/control-pagos?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+###
+GET http://localhost:5000/inscripciones/mostrar-recibos?page=2&limit=5
+Authorization: Bearer {{tokenSuper}}
+
+
+###
+GET http://localhost:5000/admin/inscripciones/control-pagos?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+###
+GET http://localhost:5000/admin/inscripciones/mostrar-recibos?page=2&limit=5
+Authorization: Bearer {{tokenSuper}}
+###
+GET http://localhost:5000/admin/preinscripcion/lista?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+
+### 1. Estudiantes
+GET http://localhost:5000/admin/estudiantes?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 2. Profesores
+GET http://localhost:5000/admin/profesor?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 3. Cursos
+GET http://localhost:5000/admin/cursos?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 4. Padres / Tutores
+GET http://localhost:5000/admin/padres-tutores?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 5. Administradores (solo super administrador)
+GET http://localhost:5000/admin/administradores?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 6. Inscripciones
+GET http://localhost:5000/admin/inscripciones?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 7. Control de pagos
+GET http://localhost:5000/admin/inscripciones/control-pagos?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 8. Recibos
+GET http://localhost:5000/admin/inscripciones/mostrar-recibos?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+### 9. Preinscripciones
+GET http://localhost:5000/admin/preinscripcion/lista?page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+
+@baseUrl = http://localhost:5000
+# Pega aquí el token del SUPER administrador (es_super = true)
+@tokenSuper = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzk1NTg3ODE3LCJleHAiOjE3OTU1ODg0MTd9.HyRaaCFlCgOH2xMlN3O_LsJzHkNJiFheHMZv0Ifaxko
+# Pega aquí el token de un administrador NORMAL (es_super = false)
+@tokenNormal = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTI4LCJlbWFpbCI6Im1hcmlhLmZsb3Jlc0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTc5NTM3ODMzNiwiZXhwIjoxNzk1Mzc4OTM2fQ.o8i3R4d-PCy7gUF4Cx1vOfAC4RyzwvTpd6K3wx8oF68
+
+# Pega aquí el token de un administrador NORMAL (es_super = false)
+@tokenProfesor = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImVtYWlsIjoibG9heXphQGdtYWlsLmNvbSIsInJvbGUiOiJwcm9mZXNvciIsImlhdCI6MTc5NTU5MjQ0MSwiZXhwIjoxNzk1NTkzMDQxfQ.kqOyOdLLcVa4nKqqmm3qUatXwHgXa2U8PkonKp37jRs
+# Pega aquí el token de un administrador NORMAL (es_super = false)
+@tokenEstudiante = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJzZXJhZmlub0BnbWFpbC5jb20iLCJyb2xlIjoiZXN0dWRpYW50ZSIsImlhdCI6MTc5NTQ5MTkwNywiZXhwIjoxNzk1NDkyNTA3fQ.7IRSUYCsiY-ErrTZpXW_qizMZAzExw1RL53A6BpTPb0
+
+### ==========================================================
+### LOGIN (copiar el token de la respuesta y pegarlo arriba)
+### ==========================================================
+
+### Login super administrador
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email": "administrador@gmail.com",
+    "password": "luis"
+}
+
+###
+GET http://localhost:5000/admin/preinscripcion/lista?page=1&limit=10&estado=Pendiente&sinAprobadas=true
+Authorization: Bearer {{tokenSuper}}
+
+###
+GET http://localhost:5000/docente/estudiantes?vista=cursos
+Authorization: Bearer {{tokenProfesor}}
+
+### usa un id_curso que te devolvió la anterior
+GET http://localhost:5000/docente/estudiantes?idCurso=19&page=1&limit=10
+Authorization: Bearer {{tokenProfesor}}
+
+### Login administrador normal
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email": "serafino@gmail.com",
+    "password": "777777"
+}
+
+### Docente: mis estudiantes
+GET http://localhost:5000/docente/estudiantes?page=1&limit=10
+Authorization: Bearer {{tokenProfesor}}
+
+### Docente: calificaciones de una evaluación (cambia los ids por unos reales)
+GET http://localhost:5000/docente/cursos/evaluacion/examen/listarCalificaciones/1/1?page=1&limit=10
+Authorization: Bearer {{tokenProfesor}}
+
+### Estudiante: cursos no inscritos
+GET http://localhost:5000/estudiante/curso/no-inscritos?page=1&limit=10
+Authorization: Bearer {{tokenEstudiante}}
+
+### Estudiante: cursos inscritos
+GET http://localhost:5000/admin/cursos?todos=true
+Authorization: Bearer {{tokenSuper}}
+
+####
+GET http://localhost:5000/admin/inscripciones/control-pagos?page=1&limit=10&estado=PENDIENTE
+Authorization: Bearer {{tokenSuper}}
+###
+GET http://localhost:5000/admin/inscripciones/mostrar-recibos?vista=resumen&page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+###
+GET http://localhost:5000/admin/inscripciones/mostrar-recibos?vista=detalle&grupo=id:15&page=1&limit=10
+Authorization: Bearer {{tokenSuper}}
+
+
+### ============ PRUEBA MULTI-ROL (serafino, id_usuarios 3) ============
+
+### 1) Login como ADMIN (copia el "token" de la respuesta y pégalo en @token)
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+  "email": "serafino@gmail.com",
+  "password": "777777"
+}
+
+### 2) Pega aquí el token del paso 1
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbmlzdHJhZG9yIiwicm9sZXMiOlsiYWRtaW5pc3RyYWRvciJdLCJpYXQiOjE3OTU2MzMyOTksImV4cCI6MTc5NTYzMzg5OX0.mD4amw0ZVQMz_bALrRIaH4lJ4eyA29oLmo4zJpgOIY8
+
+### 3) Registrar a serafino como PROFESOR (ya es estudiante) -> debe dar reutilizado: true
+POST http://localhost:5000/admin/profesor
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Serafino",
+  "apellidoPaterno": "Prueba",
+  "apellidoMaterno": "Prueba",
+  "ci": "777777",
+  "telefono": "70000000",
+  "email": "serafino@gmail.com",
+  "especialidad": "Matemáticas"
+}
+
+### 4) Error esperado: mismo email con OTRO CI -> usuario_de_otra_persona
+POST http://localhost:5000/admin/profesor
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Otro",
+  "apellidoPaterno": "Distinto",
+  "ci": "999999",
+  "telefono": "70000001",
+  "email": "serafino@gmail.com",
+  "especialidad": "Física"
+}
+
+### 5) Login de serafino (CI 777777 es su contraseña) -> el token debe traer roles ["profesor","estudiante"]
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+  "email": "serafino@gmail.com",
+  "password": "777777"
+}

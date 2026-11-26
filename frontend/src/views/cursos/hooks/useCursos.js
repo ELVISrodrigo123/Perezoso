@@ -1,0 +1,331 @@
+import {
+  getCursosPaginado,
+  postCursos,
+  putCursos,
+  deleteCursos,
+} from '../../../services/cursosService'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { getProfesor } from '../../../services/profesorService'
+import { capitalizarTexto } from '../../utils/capitalizarTexto'
+
+const valoresIniciales = {
+  nombre: '',
+  descripcion: '',
+  duracion: '',
+  unidad: '',
+  precio: '',
+  cupos: '',
+  fechaCreacion: '',
+  idProfesor: '',
+}
+
+const useCursos = () => {
+  const fechaCreacionOriginal = useRef('')
+  const [feedback, setFeedback] = useState(null)
+  const [accionEnProceso, setAccionEnProceso] = useState(null)
+  const mostrarFeedback = (message, color = 'success') => {
+    setFeedback({ message, color })
+    setTimeout(() => {
+      setFeedback(null)
+    }, 7000)
+  }
+  const [cursoParaEliminar, setCursoParaEliminar] = useState(null)
+
+  /// CARGANDO LOS CURSOS
+
+  const [cursos, setCursos] = useState([])
+  const [cargando, setCargando] = useState(true)
+
+  const [paginaActual, setPaginaActual] = useState(1)
+  const [registrosPorPagina, setRegistrosPorPagina] = useState(10)
+  const [totalRegistros, setTotalRegistros] = useState(0)
+  const [totalPaginas, setTotalPaginas] = useState(1)
+  const [filtrosColumna, setFiltrosColumna] = useState({
+    curso: '',
+    profesor: '',
+    descripcion: '',
+    duracion: '',
+    precio: '',
+    cupos: '',
+    inicio: '',
+    fin: '',
+    estado: 'Activo',
+  })
+
+  const cambiarFiltrosColumna = (actualizar) => {
+    setFiltrosColumna(actualizar)
+    setPaginaActual(1)
+  }
+
+  const cargarCursos = useCallback(async () => {
+    try {
+      const params = { page: paginaActual, limit: registrosPorPagina }
+      Object.entries(filtrosColumna).forEach(([clave, valor]) => {
+        if (valor && String(valor).trim() !== '') params[clave] = String(valor).trim()
+      })
+
+      const res = await getCursosPaginado(params)
+      const { datos, paginacion } = res.data
+      setCursos(datos)
+      setTotalRegistros(paginacion.total)
+      setTotalPaginas(paginacion.totalPaginas)
+
+      if (paginacion.totalPaginas > 0 && paginaActual > paginacion.totalPaginas) {
+        setPaginaActual(paginacion.totalPaginas)
+      }
+    } catch (error) {
+      console.error('Error al obtener cursos', error)
+      mostrarFeedback('Error al obtener cursos', 'danger')
+    } finally {
+      setCargando(false)
+    }
+  }, [paginaActual, registrosPorPagina, filtrosColumna])
+
+  useEffect(() => {
+    const temporizador = setTimeout(cargarCursos, 300)
+    return () => clearTimeout(temporizador)
+  }, [cargarCursos])
+
+  const [profesor, setProfesor] = useState([])
+
+  useEffect(() => {
+    let componenteActivo = true
+    getProfesor()
+      .then((res) => {
+        if (componenteActivo) setProfesor(res.data)
+      })
+      .catch((error) => console.error(error))
+    return () => {
+      componenteActivo = false
+    }
+  }, [])
+
+  ///CREAR CURSOS
+  const [formulario, setFormulario] = useState({ ...valoresIniciales })
+  const crearCurso = async (e) => {
+    e.preventDefault()
+    if (accionEnProceso) return
+    if (!validarFormulario()) return
+    setAccionEnProceso('guardar')
+    try {
+      const data = {
+        nombre: formulario.nombre,
+        descripcion: formulario.descripcion,
+        duracion: Number(formulario.duracion),
+        unidad: formulario.unidad,
+        precio: Number(formulario.precio),
+        cupos: Number(formulario.cupos),
+        fechaCreacion: formulario.fechaCreacion,
+        idProfesor: Number(formulario.idProfesor),
+      }
+      await postCursos(data)
+      mostrarFeedback('Curso creado correctamente', 'success')
+      setFormulario({ ...valoresIniciales })
+      await cargarCursos()
+      setErrores({})
+      return true
+    } catch (error) {
+      console.error(error)
+      mostrarFeedback(error.response?.data?.message || 'Error al registrar curso', 'danger')
+      return false
+    } finally {
+      setAccionEnProceso(null)
+    }
+  }
+
+  const handleChange = (e) => {
+    const valor =
+      e.target.name === 'nombre'
+        ? capitalizarTexto(e.target.value)
+        : e.target.name === 'descripcion'
+          ? e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1).toLowerCase()
+          : e.target.value
+
+    setFormulario({
+      ...formulario,
+      [e.target.name]: valor,
+    })
+
+    setErrores({
+      ...errores,
+      [e.target.name]: '',
+    })
+  }
+
+  ///EDITAR CURSOS
+  const [editando, setEditando] = useState(false)
+  const [idEditar, setIdEditar] = useState(null)
+
+  const seleccionarCurso = (curso) => {
+    const fechaCreacion = String(curso.fecha_creacion || curso.fechaCreacion || '').slice(0, 10)
+    const unidad =
+      curso.duracion && typeof curso.duracion === 'object' ? Object.keys(curso.duracion)[0] : ''
+    const duracion = unidad ? curso.duracion[unidad] : ''
+    fechaCreacionOriginal.current = fechaCreacion
+    setFormulario({
+      nombre: curso.nombre,
+      descripcion: curso.descripcion,
+      duracion,
+      unidad,
+      precio: curso.costo,
+      cupos: curso.cupo_total,
+      fechaCreacion,
+      idProfesor: curso.id_profesor,
+    })
+    setEditando(true)
+    setIdEditar(curso.id_curso)
+  }
+
+  const actualizarCurso = async (e) => {
+    e.preventDefault()
+    if (accionEnProceso) return
+    if (!validarFormulario()) return
+    setAccionEnProceso('actualizar')
+    try {
+      const data = {
+        nombre: formulario.nombre,
+        descripcion: formulario.descripcion,
+        duracion: Number(formulario.duracion),
+        unidad: formulario.unidad,
+        precio: Number(formulario.precio),
+        cupos: Number(formulario.cupos),
+        fechaCreacion: formulario.fechaCreacion,
+        idProfesor: Number(formulario.idProfesor),
+      }
+      await putCursos(idEditar, data)
+      mostrarFeedback('Curso actualizado correctamente', 'success')
+      setFormulario({ ...valoresIniciales })
+      setEditando(false)
+      setIdEditar(null)
+      await cargarCursos()
+      setErrores({})
+      return true
+    } catch (error) {
+      console.error(error)
+      mostrarFeedback(error.response?.data?.message || 'Error al actualizar curso', 'danger')
+      return false
+    } finally {
+      setAccionEnProceso(null)
+    }
+  }
+
+  /// DESCARTAR
+  const descartar = () => {
+    setEditando(false)
+    setIdEditar(null)
+    setFormulario({ ...valoresIniciales })
+    mostrarFeedback('La edición fue cancelada', 'info')
+  }
+
+  ///ELIMINAR CURSO
+  const eliminarCurso = (id) => {
+    setCursoParaEliminar(id)
+  }
+
+  const cancelarEliminacion = () => {
+    setCursoParaEliminar(null)
+  }
+
+  const confirmarEliminacion = async () => {
+    if (!cursoParaEliminar) return
+    if (accionEnProceso) return
+    setAccionEnProceso('eliminar')
+
+    try {
+      const mensaje = await deleteCursos(cursoParaEliminar)
+      mostrarFeedback(mensaje.data?.message || 'Curso eliminado correctamente', 'success')
+      cargarCursos()
+      cancelarEliminacion()
+    } catch (error) {
+      console.error(error)
+      mostrarFeedback(error.response?.data?.message || 'Error al eliminar curso', 'danger')
+    } finally {
+      setAccionEnProceso(null)
+    }
+  }
+
+  /// VALIDACION FORMULARIO
+
+  const [errores, setErrores] = useState({})
+  const validarFormulario = () => {
+    const nuevosErrores = {}
+    const fechaActual = new Date()
+    const fechaMinima = `${fechaActual.getFullYear()}-${String(fechaActual.getMonth() + 1).padStart(2, '0')}-${String(fechaActual.getDate()).padStart(2, '0')}`
+    if (!formulario.nombre.trim()) {
+      nuevosErrores.nombre = 'El nombre es obligatorio'
+    }
+    if (formulario.descripcion && formulario.descripcion.length > 255) {
+      nuevosErrores.descripcion = 'Máximo 255 carácteres'
+    }
+    if (formulario.duracion === '' || isNaN(Number(formulario.duracion))) {
+      nuevosErrores.duracion = 'Duración es obligatoria'
+    }
+    if (!formulario.unidad) {
+      nuevosErrores.unidad = 'Unidad es obligatorio'
+    }
+    if (formulario.precio === '' || isNaN(Number(formulario.precio))) {
+      nuevosErrores.precio = 'Precio inválido'
+    }
+    if (formulario.cupos === '' || isNaN(Number(formulario.cupos))) {
+      nuevosErrores.cupos = 'Cupos inválido'
+    }
+    if (!formulario.fechaCreacion) {
+      nuevosErrores.fechaCreacion = 'La fecha es obligatoria'
+    } else if (
+      formulario.fechaCreacion < fechaMinima &&
+      (!editando || formulario.fechaCreacion !== fechaCreacionOriginal.current)
+    ) {
+      nuevosErrores.fechaCreacion = 'La fecha no puede ser anterior a hoy'
+    }
+    if (formulario.idProfesor === '') {
+      nuevosErrores.idProfesor = 'Profesor inválido'
+    }
+    setErrores(nuevosErrores)
+
+    const llavesConErrores = Object.keys(nuevosErrores)
+    if (llavesConErrores.length > 0) {
+      const primerError = llavesConErrores[0]
+      setTimeout(() => {
+        const elementoInvalido =
+          document.getElementsByName(primerError)[0] || document.getElementById(primerError)
+        if (elementoInvalido) {
+          elementoInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          elementoInvalido.focus()
+        }
+      }, 50)
+    }
+
+    return llavesConErrores.length === 0
+  }
+
+  return {
+    cargarCursos,
+    profesor,
+    editando,
+    formulario,
+    errores,
+    cursos,
+    actualizarCurso,
+    crearCurso,
+    handleChange,
+    descartar,
+    seleccionarCurso,
+    eliminarCurso,
+    cursoParaEliminar,
+    cancelarEliminacion,
+    confirmarEliminacion,
+    feedback,
+    accionEnProceso,
+    cargando,
+    limpiarFeedback: () => setFeedback(null),
+    paginaActual,
+    setPaginaActual,
+    registrosPorPagina,
+    setRegistrosPorPagina,
+    totalRegistros,
+    totalPaginas,
+    filtrosColumna,
+    setFiltrosColumna: cambiarFiltrosColumna,
+  }
+}
+export default useCursos
