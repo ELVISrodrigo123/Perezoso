@@ -55,3 +55,9 @@ chatbot/.env
 # Local: bitácoras, grafos y métricas
 # ================================
 
+docs/avances/
+graphify-out/
+.VSCodeCounter/
+backend/.env.test
+**/00-esquema-base.sql
+**/90-datos-prueba.sql
