@@ -1,134 +1,122 @@
-# Despliegue: roles, permisos y plazo de inscripción
+# Despliegue: roles dinámicos, permisos y plazo de inscripción
 
-Pasos para llevar a producción las migraciones `002_enrollment_deadline.sql` y `003_permissions.sql` junto con el código que las usa.
+Pasos para instalar o actualizar el sistema en otra PC o en producción con el script único `db/migrations/pgadmin_full_update.sql`.
 
-## 1. Revisión previa (solo lectura)
+## 1. Qué hace el script
 
-Hay que ejecutar esto en la base de producción **antes** de migrar y revisar los resultados. Ninguna consulta modifica datos.
+`pgadmin_full_update.sql` reúne en una sola transacción (`BEGIN` / `COMMIT`):
+
+- **002**: plazo de inscripción dinámico (`configuracion_sistema`, columnas de plazo en `curso`, `historial_plazo_inscripcion`).
+- **003 + 004**:
+  - crea `roles`, `permissions` (55: 17 de menú y 38 de acción), `role_permissions` y `user_permissions`;
+  - agrega `role_id` en `usuario_roles` y `permissions_version` en `usuarios`;
+  - crea los triggers de versión y de protección del super administrador.
+
+Características:
+
+- **Idempotente**: funciona en una base sin 002/003, con 002/003 ya aplicadas, y se puede ejecutar dos veces.
+- **No borra datos**:
+  - las filas de `usuario_roles` se conservan y reciben su `role_id`;
+  - los permisos `*.read` de la 003 se renombran a sus permisos de menú.
+- No contiene datos de prueba ni contraseñas.
+- Si algo falla, PostgreSQL deshace todo.
+- Requiere las tablas base de la academia (`usuarios`, `usuario_roles`, `administradores`, `curso`, `inscripcion`, …).
+
+Los archivos `002_enrollment_deadline.sql`, `003_permissions.sql` y `004_dynamic_roles.sql` quedan como historial. Para instalar basta con el script único.
+
+## 2. Revisión previa (solo lectura)
 
 ```sql
--- Tipos de las columnas que usan las migraciones y el código
-SELECT table_name, column_name, data_type, is_nullable, column_default
-FROM information_schema.columns
-WHERE (table_name, column_name) IN (
-  ('curso','id_curso'), ('curso','fecha_creacion'), ('curso','duracion'),
-  ('curso','estado'), ('curso','cupo_total'),
-  ('usuarios','id_usuarios'), ('usuario_roles','role'), ('usuario_roles','estado'),
-  ('administradores','id_usuarios'), ('administradores','es_super'),
-  ('inscripcion','id_curso'))
-ORDER BY table_name, column_name;
--- Esperado: fecha_creacion timestamp o date, duracion interval,
---           cupo_total integer, es_super boolean.
-
--- Valores de estado y roles
-SELECT estado, COUNT(*) FROM curso GROUP BY estado;          -- solo 'Activo' / 'Inactivo'
-SELECT role, COUNT(*) FROM usuario_roles GROUP BY role;      -- administrador, profesor, estudiante
+SELECT role, estado, COUNT(*) FROM usuario_roles GROUP BY role, estado;
 SELECT es_super, COUNT(*) FROM administradores GROUP BY es_super;
-
--- Cursos con datos incompletos (el estado quedaría "sin cupos" o sin fechas)
-SELECT COUNT(*) FILTER (WHERE cupo_total IS NULL)     AS sin_cupo,
+SELECT estado, COUNT(*) FROM curso GROUP BY estado;
+SELECT COUNT(*) FILTER (WHERE cupo_total IS NULL) AS sin_cupo,
        COUNT(*) FILTER (WHERE fecha_creacion IS NULL) AS sin_inicio,
-       COUNT(*) FILTER (WHERE duracion IS NULL)       AS sin_duracion
+       COUNT(*) FILTER (WHERE duracion IS NULL) AS sin_duracion
 FROM curso;
-
--- Las tablas nuevas todavía no deben existir (todo NULL)
-SELECT to_regclass('configuracion_sistema'), to_regclass('historial_plazo_inscripcion'),
-       to_regclass('roles'), to_regclass('permissions'), to_regclass('role_permissions');
-
--- Cursos que hoy ya superan su cupo
-SELECT i.id_curso, COUNT(*) AS inscritos, c.cupo_total
-FROM inscripcion i JOIN curso c ON c.id_curso = i.id_curso
-GROUP BY i.id_curso, c.cupo_total
-HAVING COUNT(*) > c.cupo_total;
 ```
 
-Cómo interpretar los resultados:
-- Si `fecha_creacion`, `duracion` o `cupo_total` tienen valores `NULL`, hay que completarlos antes.
-- Si `curso.estado` tiene valores distintos de `Activo` o `Inactivo`, hay que normalizarlos, porque cualquier otro valor se trata como inactivo.
-- Los cursos que ya superan su cupo siguen funcionando, pero no aceptan altas nuevas.
+Qué revisar en los resultados:
 
-## 2. Migraciones
+- **Super administrador**: debe existir al menos uno activo (`es_super = true`). Si no hay ninguno, hay que marcar uno antes de usar el panel de accesos.
+- **Roles con otros nombres**: los valores de `usuario_roles.role` que no sean los 4 base se crean como roles nuevos sin permisos; hay que asignárselos después en el panel.
+- **Cursos incompletos**: los cursos sin cupo, fecha o duración hay que completarlos antes.
 
-1. Respaldar la base (`pg_dump -Fc`).
-2. Ejecutar en este orden, cada una con `psql -v ON_ERROR_STOP=1 -f <archivo>`:
+## 3. Ejecutar en pgAdmin 4
 
-| Orden | Archivo | Qué crea |
-|---|---|---|
-| 1 | `db/migrations/002_enrollment_deadline.sql` | `configuracion_sistema` (una fila, 10 días), columnas `dias_plazo_inscripcion`, `plazo_actualizado_por`, `plazo_actualizado_en` en `curso`, tabla `historial_plazo_inscripcion` |
-| 2 | `db/migrations/003_permissions.sql` | `roles`, `permissions` (50), `role_permissions`. Aborta si falta la 002 o `curso.estado` |
+1. Hacer un respaldo: clic derecho en la base → *Backup…* (formato *Custom*).
+2. Clic derecho en la base → *Query Tool*.
+3. Abrir `db/migrations/pgadmin_full_update.sql` (o pegar su contenido) y ejecutar con **F5**.
+4. Ejecutar por separado las consultas de verificación que trae el final del archivo. Resultado esperado:
+   - `permissions`: 55 (17 de tipo `menu`);
+   - permisos por rol: `administrador` 31, `estudiante` 6, `profesor` 10, `super_administrador` 10;
+   - 0 filas de `usuario_roles` sin rol en el catálogo;
+   - al menos 1 super administrador activo.
 
-3. Ejecutar las consultas de verificación que trae cada archivo. Resultado esperado para la 003:
-   - permisos por rol: `administrador` 30, `super_administrador` 6, `profesor` 9, `estudiante` 5;
-   - 50 permisos en total;
-   - 0 roles de `usuario_roles` fuera del catálogo.
+Con `psql`, lo equivalente es `psql -v ON_ERROR_STOP=1 -d <base> -f db/migrations/pgadmin_full_update.sql`.
 
-La 002 no cambia el comportamiento por sí sola: el global queda en 10 días y los cursos existentes en `NULL`, o sea, usan el global.
+**Rollback.** Está comentado al final del script. Hay que quitar los `--` y ejecutarlo. Después hay que volver también a la versión anterior del código, porque el backend nuevo necesita estas tablas.
 
-### Rollback
+## 4. Código y variables de entorno
 
-Está comentado al final de cada archivo. Se aplica en orden inverso:
-
-```sql
--- 1) deshacer 003
-BEGIN;
-DROP TABLE IF EXISTS role_permissions;
-DROP TABLE IF EXISTS permissions;
-DROP TABLE IF EXISTS roles;
-COMMIT;
-
--- 2) deshacer 002
-BEGIN;
-DROP TABLE IF EXISTS historial_plazo_inscripcion;
-ALTER TABLE curso
-  DROP COLUMN IF EXISTS plazo_actualizado_en,
-  DROP COLUMN IF EXISTS plazo_actualizado_por,
-  DROP COLUMN IF EXISTS dias_plazo_inscripcion;
-DROP TABLE IF EXISTS configuracion_sistema;
-COMMIT;
+```bash
+git clone <url-del-repo>   # o git pull en una copia existente
+cd backend && npm install
+cd ../frontend && npm install
 ```
 
-Si se deshacen las migraciones, también hay que volver a la versión anterior del código: el backend nuevo necesita estas tablas.
+`backend/.env` (valores de ejemplo; no subir este archivo):
 
-## 3. Variables de entorno
+```
+PORT=5000
+DATABASE_URL=<cadena de conexión a PostgreSQL>
+JWT_SECRET=<secreto largo y aleatorio>
+CHATBOT_API_KEY=<clave para el chatbot>
+RECIBO_VERIFICACION_SECRET=<secreto largo y aleatorio>
+FRONTEND_URL=<url del frontend>
+N8N_WEBHOOK_PAGO_URL=<url del webhook de n8n>
+N8N_WEBHOOK_KEY=<clave del webhook>
+```
 
-**No hay variables nuevas.** El backend y el frontend usan las mismas que antes. La zona horaria de la academia (`America/La_Paz`) está fija en el código.
+`frontend/.env`:
 
-## 4. Despliegue del código
+```
+VITE_API_URL=<url del backend>
+```
 
-Hay que desplegar el backend y el frontend **juntos**: el frontend nuevo lee los campos de estado de inscripción y los permisos del token.
+No hay variables nuevas respecto a la versión anterior.
+
+Para levantar el sistema:
+
+- desarrollo: `npm run dev` en `backend/` y `npm start` en `frontend/`;
+- todo junto: `docker-compose up --build`.
+
+Hay que desplegar backend y frontend **juntos**: el frontend nuevo arma el sidebar con `GET /perfil/menu` y lee `permissions` del token.
 
 ## 5. Checklist después del deploy
 
-- [ ] Login como administrador, super administrador, profesor y estudiante: el access token trae `permisos` y `type: "access"`.
-- [ ] Los usuarios con sesión abierta pueden tener que volver a iniciar sesión una vez (ver el punto 6).
-- [ ] `GET /admin/configuracion/plazo-inscripcion` responde 200 con `"dias": 10`.
-- [ ] Un administrador común recibe 403 al cambiar el plazo global; un super administrador recibe 200.
-- [ ] En Gestión de cursos, la columna "Inscripción" coincide con lo esperado en dos o tres cursos reales.
-- [ ] Una inscripción a un curso abierto responde 201; una a un curso vencido, 409 con el mensaje correspondiente.
-- [ ] `GET /estudiante/inscripciones` responde 404.
-- [ ] El chatbot (`GET /api/chatbot/cursos`) devuelve `inscripcion_abierta` y `fecha_limite_inscripcion`.
-- [ ] Si algo falla: rollback de la 003, después de la 002, y volver a la versión anterior del código.
+- [ ] Login sin selector de rol. Un usuario con dos roles ve un solo menú con los ítems de ambos.
+- [ ] El access token trae `roles`, `permissions`, `permissions_version` y `type: "access"`.
+- [ ] El super administrador ve *Gestión de accesos* con las pestañas Roles y Usuarios.
+- [ ] Si se deniega un permiso a un usuario en el panel, su siguiente acción ya no lo tiene: el frontend renueva el token y el menú se actualiza.
+- [ ] `POST /cambiar-rol` responde 404.
+- [ ] Un profesor en `/docente/cursos` y un estudiante en `/estudiante/cursos` ven solo sus propios datos.
+- [ ] `GET /admin/configuracion/plazo-inscripcion` responde 200. La columna "Inscripción" de Cursos coincide con lo esperado.
+- [ ] El modo claro y el oscuro se ven bien en Configuración, Cursos, Inscripciones, Control de pagos y las tablas de usuarios.
 
-## 6. Cambios de comportamiento respecto a antes
+## 6. Cambios de comportamiento
 
-- **Sesión:**
-  - Los access tokens ahora llevan `type`. Los emitidos antes del despliegue se rechazan con 401, y el frontend los renueva automáticamente.
-  - Los refresh tokens anteriores también se rechazan, así que cada usuario inicia sesión una vez más.
-  - El header `Authorization` debe usar el esquema `Bearer`.
-- **Seguridad (corregido):**
-  - El rol estudiante tenía acceso indebido a rutas de inscripciones de administración; ahora `/estudiante/inscripciones*` responde 404.
-  - El refresh token ya no puede usarse como access token.
-- **Permisos:** además del rol, varias rutas exigen un permiso. Un rol sin el permiso correspondiente recibe 403.
-- **Plazo:**
-  - Antes eran 10 días fijos, calculados en el navegador y sin tope.
-  - Ahora el plazo es configurable (global y por curso, 0–90), lo calcula el backend en hora de La Paz y tiene como tope la fecha de fin.
-- **Validación al inscribir:**
-  - Inscribirse a un curso inactivo, terminado, con el plazo vencido o sin cupos responde 409, también cuando inscribe un administrador.
-  - Antes no se validaba el cupo.
-- **Inscripción por administrador:**
-  - Ahora es una transacción real (todo o nada).
-  - Solo se validan los cursos nuevos; los ya inscritos se conservan.
-- **`GET /perfil`:** devuelve `{ message, usuario: { id, email, role, roles, permisos } }`.
-- **Interfaz:**
-  - La etiqueta "Fecha de creación" del formulario de curso ahora dice "Fecha de inicio"; la columna de la base no cambió.
-  - Hay una página nueva de Configuración y un botón Plazo en Gestión de cursos.
+- **Login y sesión**:
+  - no hay selector de rol en el login ni opción "Cambiar a" en el header;
+  - los tokens anteriores al despliegue se rechazan, así que cada usuario inicia sesión una vez más.
+- **Permisos**:
+  - toda ruta protegida exige un permiso;
+  - un `403` ya no cierra la sesión en el frontend; solo un `401` sin refresh posible lo hace.
+- **Cambios de accesos al instante**: cualquier cambio de roles o permisos, incluido uno hecho a mano en la base, incrementa `usuarios.permissions_version`. El token viejo deja de servir en segundos.
+- **Super administrador**: no se puede bloquear, no se le pueden denegar permisos y siempre debe quedar al menos uno. La base lo hace cumplir con triggers.
+- **Seguridad (corregido)**: un profesor ya no puede consultar los exámenes calificados de un curso que no dicta.
+- **Interfaz**:
+  - sidebar armado desde la base;
+  - columna Roles con chips y botón Accesos en las tablas de usuarios;
+  - "Dar de baja" y "Activar" con los mismos nombres y colores en todas las tablas;
+  - tarjetas y textos que respetan el modo oscuro.
