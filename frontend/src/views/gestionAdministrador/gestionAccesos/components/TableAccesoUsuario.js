@@ -142,9 +142,11 @@ const TableAccesoUsuario = ({
             <p className="bm-section-card-description mb-0">
               {activos + inactivos} {tipoUsuario} · {activos} activos · {inactivos} inactivos
             </p>
-            <CButton type="button" color="secondary" variant="outline" onClick={onVolver}>
-              Volver
-            </CButton>
+            {onVolver && (
+              <CButton type="button" color="secondary" variant="outline" onClick={onVolver}>
+                Volver
+              </CButton>
+            )}
           </div>
         </div>
       }

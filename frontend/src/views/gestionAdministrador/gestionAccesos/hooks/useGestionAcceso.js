@@ -6,8 +6,8 @@ import {
   activarAdministrador,
   darBajaAdministrador,
   obtenerAdministradoresPaginado,
-  verificarEsSuper,
 } from '../../../../services/gestionAdministrador/superAdministrador'
+import { hasPermission } from '../../../utils/usuario'
 
 const filtrosIniciales = {
   nombre: '',
@@ -57,7 +57,6 @@ const construirParametros = (rol, filtros, base) => {
 }
 
 export const useGestionAcceso = (rol) => {
-  const [esSuper, setEsSuper] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [usuarios, setUsuarios] = useState([])
   const [conteos, setConteos] = useState({
@@ -117,7 +116,7 @@ export const useGestionAcceso = (rol) => {
     return () => clearTimeout(temporizador)
   }, [cargarUsuarios])
 
-  const cargarConteos = useCallback(async (soySuper) => {
+  const cargarConteos = useCallback(async () => {
     const contar = async (rolConsultado, estado) => {
       const { paginacion } = await consultarPorRol(rolConsultado, { page: 1, limit: 1, estado })
       return paginacion.total
@@ -130,10 +129,12 @@ export const useGestionAcceso = (rol) => {
       return { activos, inactivos }
     }
 
+    const contarSiPuede = (rolConsultado, permiso) =>
+      hasPermission(permiso) ? contarRol(rolConsultado) : Promise.resolve(conteoVacio)
     const [docente, estudiante, administrador] = await Promise.all([
-      contarRol('docente'),
-      contarRol('estudiante'),
-      soySuper ? contarRol('administrador') : Promise.resolve(conteoVacio),
+      contarSiPuede('docente', 'menu.teachers.view'),
+      contarSiPuede('estudiante', 'menu.students.view'),
+      contarSiPuede('administrador', 'menu.admins.view'),
     ])
     setConteos({ docente, estudiante, administrador })
   }, [])
@@ -143,10 +144,8 @@ export const useGestionAcceso = (rol) => {
 
     const cargarInicial = async () => {
       try {
-        const soySuper = (await verificarEsSuper().catch(() => false)) === true
         if (!componenteActivo) return
-        setEsSuper(soySuper)
-        await cargarConteos(soySuper)
+        await cargarConteos()
       } catch (error) {
         if (componenteActivo) console.error('Error al cargar los conteos de accesos', error)
       }
@@ -159,8 +158,8 @@ export const useGestionAcceso = (rol) => {
   }, [cargarConteos])
 
   const recargar = useCallback(async () => {
-    await Promise.all([cargarUsuarios(), cargarConteos(esSuper)])
-  }, [cargarUsuarios, cargarConteos, esSuper])
+    await Promise.all([cargarUsuarios(), cargarConteos()])
+  }, [cargarUsuarios, cargarConteos])
 
   const solicitarBaja = (usuario, rolUsuario) => {
     setUsuarioParaBaja({ usuario, rol: rolUsuario })
@@ -206,7 +205,6 @@ export const useGestionAcceso = (rol) => {
   }
 
   return {
-    esSuper,
     cargando,
     usuarios,
     conteos,

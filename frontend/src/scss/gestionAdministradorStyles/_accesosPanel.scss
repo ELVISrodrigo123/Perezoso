@@ -1,0 +1,137 @@
+.acceso-seccion {
+  margin-bottom: 1.25rem;
+}
+
+.acceso-seccion__titulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cui-secondary-color);
+}
+
+.acceso-grupo {
+  border: 1px solid var(--cui-border-color);
+  border-radius: var(--radius-md);
+  background: var(--bm-surface);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.acceso-permiso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0.875rem;
+}
+
+.acceso-permiso .form-check {
+  margin-bottom: 0;
+}
+
+.acceso-permiso--menu {
+  background: var(--bm-surface-muted);
+}
+
+.acceso-permiso--accion {
+  padding-left: 2rem;
+  border-top: 1px solid var(--cui-border-color);
+}
+
+.acceso-permiso__texto {
+  min-width: 0;
+  flex: 1 1 14rem;
+}
+
+.acceso-roles__item {
+  color: var(--cui-body-color);
+  background: var(--bm-surface);
+  border-color: var(--cui-border-color);
+}
+
+.acceso-roles__item.active .acceso-roles__meta {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.acceso-roles__meta {
+  color: var(--cui-secondary-color);
+}
+
+.acceso-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.acceso-chip__quitar {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.acceso-chip__quitar:hover,
+.acceso-chip__quitar:focus-visible {
+  opacity: 1;
+}
+
+.acceso-ficha {
+  padding: 1rem;
+  border: 1px dashed var(--cui-border-color);
+  border-radius: var(--radius-md);
+  background: var(--bm-surface-muted);
+}
+
+.acceso-preview {
+  max-width: 22rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  background: #212631;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.acceso-preview__seccion {
+  padding: 0.5rem 0.75rem 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.acceso-preview .acceso-preview__item {
+  display: flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.87);
+  padding: 0.4rem 0.75rem;
+}
+
+@media (max-width: 575.98px) {
+  .acceso-permiso--accion {
+    padding-left: 1rem;
+  }
+
+  .acceso-permiso .btn-group {
+    width: 100%;
+  }
+
+  .acceso-permiso .btn-group .btn {
+    flex: 1 1 0;
+    font-size: 0.75rem;
+  }
+
+  .acceso-preview {
+    max-width: 100%;
+  }
+}

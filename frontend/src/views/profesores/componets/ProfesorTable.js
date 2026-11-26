@@ -23,6 +23,9 @@ import { cilFilter, cilSearch } from '@coreui/icons'
 import { useEffect, useState } from 'react'
 import { SectionCard, StatusBadge, LoadingState, EmptyState } from '../../../components'
 import Paginacion from '../../../components/Paginacion'
+import RolesChips from '../../gestionAdministrador/gestionAccesos/components/RolesChips'
+import AccesoUsuarioModal from '../../gestionAdministrador/gestionAccesos/components/AccesoUsuarioModal'
+import { hasPermission } from '../../utils/usuario'
 
 const ProfesorTable = ({
   profesor,
@@ -45,6 +48,8 @@ const ProfesorTable = ({
   filtrosColumna,
   setFiltrosColumna,
 }) => {
+  const [cuentaAccesos, setCuentaAccesos] = useState(null)
+  const puedeGestionarAccesos = hasPermission('users.access.manage')
   const [filtroAbierto, setFiltroAbierto] = useState(null)
   const estadosProfesor = ['Activo', 'Inactivo']
 
@@ -140,6 +145,9 @@ const ProfesorTable = ({
                 {renderEncabezadoFiltrable('Email', 'email', 'search')}
                 {renderEncabezadoFiltrable('Especialidad', 'especialidad')}
                 {renderEncabezadoFiltrable('Registro', 'registro', 'date')}
+                <CTableHeaderCell scope="col" className="table-profesor__head">
+                  Roles
+                </CTableHeaderCell>
                 {renderEncabezadoFiltrable('Estado', 'estado', 'select')}
                 <CTableHeaderCell scope="col" className="table-profesor__head text-end">
                   Acciones
@@ -149,7 +157,7 @@ const ProfesorTable = ({
             <CTableBody>
               {profesor.length === 0 ? (
                 <CTableRow>
-                  <CTableDataCell colSpan={9} className="table-profesor__empty-results">
+                  <CTableDataCell colSpan={10} className="table-profesor__empty-results">
                     No se encontraron coincidencias
                   </CTableDataCell>
                 </CTableRow>
@@ -178,6 +186,9 @@ const ProfesorTable = ({
                       {profe.fecha_registro
                         ? new Date(profe.fecha_registro).toLocaleDateString()
                         : '---'}
+                    </CTableDataCell>
+                    <CTableDataCell className="table-profesor__cell">
+                      <RolesChips roles={profe.roles} esSuper={false} />
                     </CTableDataCell>
                     <CTableDataCell className="table-profesor__cell">
                       <StatusBadge status={profe.estado || 'inactivo'}>
@@ -216,6 +227,16 @@ const ProfesorTable = ({
                             Activar
                           </CButton>
                         )}
+                        {puedeGestionarAccesos && profe.id_cuenta && (
+                          <CButton
+                            color="secondary"
+                            variant="outline"
+                            onClick={() => setCuentaAccesos(profe.id_cuenta)}
+                            className="profesor-table__action"
+                          >
+                            Accesos
+                          </CButton>
+                        )}
                       </CButtonGroup>
                     </CTableDataCell>
                   </CTableRow>
@@ -223,6 +244,11 @@ const ProfesorTable = ({
               )}
             </CTableBody>
           </CTable>
+          <AccesoUsuarioModal
+            idUsuario={cuentaAccesos}
+            visible={cuentaAccesos !== null}
+            onClose={() => setCuentaAccesos(null)}
+          />
           <Paginacion
             page={paginaActual}
             limit={registrosPorPagina}

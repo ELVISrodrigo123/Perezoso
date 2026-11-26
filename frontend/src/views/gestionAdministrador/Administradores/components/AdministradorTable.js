@@ -24,6 +24,9 @@ import { cilFilter, cilSearch } from '@coreui/icons'
 import { useState } from 'react'
 import { SectionCard, StatusBadge, LoadingState, EmptyState } from '../../../../components'
 import Paginacion from '../../../../components/Paginacion'
+import RolesChips from '../../gestionAccesos/components/RolesChips'
+import AccesoUsuarioModal from '../../gestionAccesos/components/AccesoUsuarioModal'
+import { hasPermission } from '../../../utils/usuario'
 
 const AdministradorTable = ({
   administradores,
@@ -45,6 +48,8 @@ const AdministradorTable = ({
   filtrosColumna,
   setFiltrosColumna,
 }) => {
+  const [cuentaAccesos, setCuentaAccesos] = useState(null)
+  const puedeGestionarAccesos = hasPermission('users.access.manage')
   const [filtroAbierto, setFiltroAbierto] = useState(null)
 
   const obtenerNombreCompleto = (admin) =>
@@ -147,6 +152,9 @@ const AdministradorTable = ({
                 {renderEncabezadoFiltrable('Teléfono', 'telefono')}
                 {renderEncabezadoFiltrable('Email', 'email', 'search')}
                 {renderEncabezadoFiltrable('Registro', 'registro', 'date')}
+                <CTableHeaderCell scope="col" className="table-administrador__head">
+                  Roles
+                </CTableHeaderCell>
                 {renderEncabezadoFiltrable('Estado', 'estado', 'select')}
                 <CTableHeaderCell scope="col" className="table-administrador__head text-end">
                   Acciones
@@ -156,7 +164,7 @@ const AdministradorTable = ({
             <CTableBody>
               {administradores.length === 0 ? (
                 <CTableRow>
-                  <CTableDataCell colSpan={8} className="table-administrador__empty-results">
+                  <CTableDataCell colSpan={9} className="table-administrador__empty-results">
                     No se encontraron coincidencias
                   </CTableDataCell>
                 </CTableRow>
@@ -187,6 +195,9 @@ const AdministradorTable = ({
                       {admin.fecha_registro
                         ? new Date(admin.fecha_registro).toLocaleDateString()
                         : '---'}
+                    </CTableDataCell>
+                    <CTableDataCell className="table-administrador__cell">
+                      <RolesChips roles={admin.roles} esSuper={admin.es_super} />
                     </CTableDataCell>
                     <CTableDataCell className="table-administrador__cell">
                       <StatusBadge status={admin.estado || 'inactivo'}>
@@ -227,6 +238,16 @@ const AdministradorTable = ({
                               Activar
                             </CButton>
                           ))}
+                        {puedeGestionarAccesos && admin.id_cuenta && (
+                          <CButton
+                            color="secondary"
+                            variant="outline"
+                            onClick={() => setCuentaAccesos(admin.id_cuenta)}
+                            className="administrador-table__action"
+                          >
+                            Accesos
+                          </CButton>
+                        )}
                       </CButtonGroup>
                     </CTableDataCell>
                   </CTableRow>
@@ -234,6 +255,11 @@ const AdministradorTable = ({
               )}
             </CTableBody>
           </CTable>
+          <AccesoUsuarioModal
+            idUsuario={cuentaAccesos}
+            visible={cuentaAccesos !== null}
+            onClose={() => setCuentaAccesos(null)}
+          />
           <Paginacion
             page={paginaActual}
             limit={registrosPorPagina}

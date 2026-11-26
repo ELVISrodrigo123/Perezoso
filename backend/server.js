@@ -25,6 +25,7 @@ import { verificarToken } from './middlewares/veriificarToken.js'
 
 import superAdministradorRoutes from './routes/gestionAdministrador/superAdministrador.js'
 import plazoInscripcionRoutes from './routes/gestionAdministrador/plazoInscripcionRoutes.js'
+import accesosRoutes from './routes/gestionAdministrador/accesosRoutes.js'
 
 dotenv.config({ path: './.env' })
 const app = express()
@@ -53,6 +54,7 @@ app.use('/admin', inscripcionRoutes)
 app.use('/admin', padresTutorRoutes)
 app.use('/admin', habilitacionEstados)
 app.use('/admin', plazoInscripcionRoutes)
+app.use('/admin', accesosRoutes)
 
 app.use('/docente', verificarToken, gestionProfesorRoutes)
 app.use('/estudiante', verificarToken, gestionEstudianteRoutes)

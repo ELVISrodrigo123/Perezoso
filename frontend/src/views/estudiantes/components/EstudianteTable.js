@@ -31,6 +31,9 @@ import {
 } from '../../../services/controlPagosParaEstudiantes'
 import { getMostrandoPadresTutores } from '../../../services/padreTutorService'
 import { generarReciboPdf } from '../../utils/generarReciboPdf'
+import RolesChips from '../../gestionAdministrador/gestionAccesos/components/RolesChips'
+import AccesoUsuarioModal from '../../gestionAdministrador/gestionAccesos/components/AccesoUsuarioModal'
+import { hasPermission } from '../../utils/usuario'
 
 const EstudianteTable = ({
   cargando,
@@ -65,6 +68,8 @@ const EstudianteTable = ({
   filtrosColumna,
   setFiltrosColumna,
 }) => {
+  const [cuentaAccesos, setCuentaAccesos] = useState(null)
+  const puedeGestionarAccesos = hasPermission('users.access.manage')
   const [filtroAbierto, setFiltroAbierto] = useState(null)
 
   const obtenerNombreCompleto = (estudiante) =>
@@ -526,6 +531,9 @@ const EstudianteTable = ({
                   {renderFilterHeader('telefono', 'Teléfono')}
                   {renderFilterHeader('email', 'Email')}
                   {renderFilterHeader('registro', 'Registro', 'date')}
+                  <CTableHeaderCell scope="col" className="table-estudiante__head-cell">
+                    Roles
+                  </CTableHeaderCell>
                   {renderFilterHeader('estado', 'Estado', 'select', estadosDisponibles)}
                   <CTableHeaderCell scope="col" className="text-end table-estudiante__head-cell">
                     Acciones
@@ -535,7 +543,7 @@ const EstudianteTable = ({
               <CTableBody>
                 {estudiantes.length === 0 ? (
                   <CTableRow>
-                    <CTableDataCell colSpan={9} className="table-estudiante__empty-results">
+                    <CTableDataCell colSpan={10} className="table-estudiante__empty-results">
                       No se encontraron coincidencias
                     </CTableDataCell>
                   </CTableRow>
@@ -562,6 +570,9 @@ const EstudianteTable = ({
                       </CTableDataCell>
                       <CTableDataCell className="table-estudiante__cell">
                         {new Date(est.fecha_registro).toLocaleDateString()}
+                      </CTableDataCell>
+                      <CTableDataCell className="table-estudiante__cell">
+                        <RolesChips roles={est.roles} esSuper={false} />
                       </CTableDataCell>
                       <CTableDataCell className="table-estudiante__cell">
                         <StatusBadge status={est.estado || 'inactivo'}>
@@ -620,6 +631,16 @@ const EstudianteTable = ({
                               Dar de baja
                             </CButton>
                           )}
+                          {puedeGestionarAccesos && est.id_cuenta && (
+                            <CButton
+                              color="secondary"
+                              variant="outline"
+                              onClick={() => setCuentaAccesos(est.id_cuenta)}
+                              className="estudiante-table__action"
+                            >
+                              Accesos
+                            </CButton>
+                          )}
                         </CButtonGroup>
                       </CTableDataCell>
                     </CTableRow>
@@ -627,6 +648,11 @@ const EstudianteTable = ({
                 )}
               </CTableBody>
             </CTable>
+            <AccesoUsuarioModal
+              idUsuario={cuentaAccesos}
+              visible={cuentaAccesos !== null}
+              onClose={() => setCuentaAccesos(null)}
+            />
             <Paginacion
               page={paginaActual}
               limit={registrosPorPagina}
